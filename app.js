@@ -7,8 +7,8 @@ app.get('/hello',function(req, res){
 app.use('/', express.static('./public'));
 
 
-var server = app.listen(5000, function () {
+var server = app.listen(process.env.PORT || 5000, function () {
   var host = server.address().address;
   var port = server.address().port;
-  console.log('App listen at http://%s:%s', host, port);
+  console.log('App listen at http://%s:%s', host,port);
 })
