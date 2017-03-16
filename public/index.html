@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=0"><title>one</title><script src=https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js></script><link type=text/css rel=stylesheet href=https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css><link href=/static/css/app.20ce82d42966e7a612dd718a20b261c4.css rel=stylesheet></head><body><h1>Welcome to My Awesome App</h1><div id=firebaseui-auth-container></div><div id=app-box></div><script src=https://www.gstatic.com/firebasejs/3.7.2/firebase.js></script><script>// Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyChSISqvhv-7lmtX86J-YjTvqL0T6l7Pxc",
+        authDomain: "one-1-a03b6.firebaseapp.com",
+        databaseURL: "https://one-1-a03b6.firebaseio.com",
+        storageBucket: "one-1-a03b6.appspot.com",
+        messagingSenderId: "10986861641"
+      };
+      firebase.initializeApp(config);
+      var database = firebase.database();</script><script type=text/javascript>// FirebaseUI config.
+      var uiConfig = {
+        signInSuccessUrl: 'https://one-1-a03b6.firebaseapp.com/#/',
+        signInOptions: [
+          // Leave the lines as is for the providers you want to offer your users.
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.GithubAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID
+        ],
+        // Terms of service url.
+        tosUrl: 'https://one-1-a03b6.firebaseapp.com/#/'
+      };
+
+      // Initialize the FirebaseUI Widget using Firebase.
+      // var ui = new firebaseui.auth.AuthUI(firebase.auth());
+      // // The start method will wait until the DOM is loaded.
+      // ui.start('#firebaseui-auth-container', uiConfig);</script><script type=text/javascript src=/static/js/manifest.9e01ea1fb1a72da1e056.js></script><script type=text/javascript src=/static/js/vendor.b7450d80a4aa83b6a64e.js></script><script type=text/javascript src=/static/js/app.5c1f6507127d91617d51.js></script></body></html>
