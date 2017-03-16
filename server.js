@@ -8,6 +8,7 @@ if (!process.env.NODE_ENV) {
 var opn = require('opn')
 var path = require('path')
 var express = require('express')
+var bodyParser = require('body-parser')
 var webpack = require('webpack')
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = process.env.NODE_ENV === 'testing'
@@ -62,12 +63,12 @@ app.use(hotMiddleware)
 
 // serve pure static assets
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
-app.post('/test/post', function (req, res) {
+app.use(staticPath, express.static('./public'))
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+app.post('/test/post', urlencodedParser, function (req, res) {
+  console.log(req.body.name)
   res.send({name:'ANB',age:18});
 });
-
-
-app.use(staticPath, express.static('./static'))
 
 var uri = 'http://localhost:' + port
 
