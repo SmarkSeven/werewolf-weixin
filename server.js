@@ -62,6 +62,11 @@ app.use(hotMiddleware)
 
 // serve pure static assets
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
+app.post('/test/post', function (req, res) {
+  res.send({name:'ANB',age:18});
+});
+
+
 app.use(staticPath, express.static('./static'))
 
 var uri = 'http://localhost:' + port
