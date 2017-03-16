@@ -78,7 +78,7 @@ devMiddleware.waitUntilValid(function () {
 
 module.exports = app.listen(port, function (err) {
   if (err) {
-    console.log(err)
+    console.log('Listen 出错了', err)
     return
   }
 
