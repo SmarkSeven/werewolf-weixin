@@ -4,19 +4,25 @@
       <img class="logo" src="../assets/vux_logo.png">
       <h1> </h1>
     </div>
-    <group title="cell demo">
-      <cell title="Vux" value="Cool" is-link></cell>
+    <group title="cell demo" @click="load">
+      <cell title="Vux" value="Call" ></cell>
     </group>
+    <button-tab style="margin:20px 40px;">
+        <button-tab-item selected>Articles</button-tab-item>
+        <button-tab-item @on-item-click="load">Products</button-tab-item>
+     </button-tab>
   </div>
 </template>
 
 <script>
-import { Group, Cell } from 'vux';
+import { ButtonTab, ButtonTabItem, Group, Cell } from 'vux';
 
 export default {
   components: {
     Group,
     Cell,
+    ButtonTab,
+    ButtonTabItem,
   },
   data() {
     return {
@@ -26,6 +32,23 @@ export default {
       // its initial state.
       msg: 'Hello World!',
     };
+  },
+  methods: {
+    load() {
+      const self = this;
+      self.$vux.loading.show({
+        text: 'Loading',
+      });
+      self.$http.get('/hello')
+      .then((resp) => {
+        self.$vux.loading.hide();
+        console.log(resp.data);
+      })
+      .catch((error) => {
+        self.$vux.loading.hide();
+        console.log(error);
+      });
+    },
   },
 };
 </script>
