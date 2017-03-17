@@ -6,7 +6,7 @@ import VueRouter from 'vue-router';
 import axios from 'axios';
 import { LoadingPlugin } from 'vux';
 import App from './App';
-import Home from './components/HelloFromVux';
+import Home from './components/Home';
 
 Vue.use(VueRouter);
 Vue.prototype.$http = axios;
