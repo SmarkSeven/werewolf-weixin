@@ -13,5 +13,10 @@ module.exports = {
     require('autoprefixer')({
       browsers: ['iOS >= 7', 'Android >= 4.1']
     })
-  ]
+  ],
+  vue: {
+    loaders: {
+      scss: ['vue-style-loader','css', 'sass'].join('!')
+    }
+  },
 }

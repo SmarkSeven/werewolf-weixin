@@ -64,7 +64,8 @@ export default {
   },
 };
 </script>
-<style>
+<style lang="scss">
+@import '../styles/rem.scss';
 .header {
   position: fixed;
   padding: 3px 0;
@@ -110,7 +111,7 @@ export default {
   left: 12px
 }
 .header .header-left .header-back {
-  padding-left: 8px
+  padding-left: 16px
 }
 .header .header-left .left-arrow {
   position: absolute;
@@ -118,18 +119,18 @@ export default {
   height: 30px;
   top: -5px;
   left: -5px;
+  &:before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid black;
+  border-width: 1px 0 0 1px;
+  transform: rotate(315deg);
+  top: 8px;
+  left: 7px;
+ }
 }
-.header .header-left .left-arrow::before {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 1px solid black;
-    border-width: 1px 0 0 1px;
-    transform: rotate(315deg);
-    top: 8px;
-    left: 7px;
-  }
 .header .header-right {
   right: 10px
 }
