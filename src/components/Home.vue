@@ -8,25 +8,25 @@
       <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @click-like="like" @on-img-click="showImg" @on-card-click="showPage"></card>
      </loadmore>
       <tabbar>
-        <tabbar-item selected ref="tab-home" link="/" :class="{'selected-tabbar':true}">
+        <tabbar-item :selected="path === '/'" ref="tab-home" link="/">
           <div slot="icon">
               <x-icon type="android-home" :size="27"></x-icon>
           </div>
           <span slot="label">首页</span>
         </tabbar-item>
-        <tabbar-item link="/reading">
+        <tabbar-item link="/reading":selected="path === '/reading'" >
           <div slot="icon">
               <x-icon type="ios-paper" :size="27"></x-icon>
           </div>
           <span slot="label">阅读</span>
         </tabbar-item>
-        <tabbar-item  link="/music">
+        <tabbar-item  link="/music" :selected="path === '/music'">
           <div slot="icon" >
               <x-icon type="ios-musical-note" :size="27"></x-icon>
           </div>
           <span slot="label">音乐</span>
         </tabbar-item>
-        <tabbar-item link="/movie">
+        <tabbar-item link="/movie" :selected="path === '/movie'">
           <div slot="icon">
               <x-icon type="ios-film" :size="27"></x-icon>
           </div>
@@ -148,8 +148,10 @@ export default {
       'pushMusicList',
       'pushMovieList',
     ]),
-    showPage() {
-      console.log('show page');
+    showPage(opt) {
+      if (opt.category === 1) {
+        this.$router.push({ path: `/essay/${opt.contentId}` });
+      }
     },
     showImg() {
       console.log('show img');

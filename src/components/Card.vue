@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class="[boxType]" @click="clickCard">
+  <div class="card" :class="[cardType]" @click="clickCard">
     <!--card类型-->
     <div class="tag label">{{tag}}</div>
     <!--标题-->
@@ -9,7 +9,7 @@
         <img class="img" v-lazy="cardItem.img_url">
     </div>
     <p v-show="cardItem.category === '0'" class="label pic-info">{{cardItem.title}} | {{cardItem.pic_info}}</p>
-    <p class="forward" :class="{'forward-bottom': cardItem.category != 5}">{{cardItem.forward}}</p>
+    <p class="forward" :class="{'forward-bottom': cardItem.category != 5}" v-html="forward"></p>
     <p v-show="cardItem.category === '5'" class="movie-subtitle">——《{{cardItem.subtitle}}》</p>
     <p v-show="cardItem.category === '0'" class="label words-info">{{cardItem.words_info}}</p>
     <div class="footer">
@@ -61,7 +61,7 @@ export default{
       }
       return `文╱${name}`;
     },
-    boxType() {
+    cardType() {
       switch (this.cardItem.category) {
         case '0': // 绘画
           return 'hp-card';
@@ -80,17 +80,31 @@ export default{
     date() {
       return getDateDiff(new Date(this.cardItem.post_date).getTime());
     },
+    forward() {
+      const forward = this.cardItem.forward.replace(/\r\n/g, '<br>');
+      return forward;
+    },
   },
   methods: {
     clickImg() {
+      const opt = {
+        id: Number(this.cardItem.id),
+        category: Number(this.cardItem.category),
+        contentId: Number(this.cardItem.content_id),
+      };
       if (this.cardItem === '0') {
         this.$emit('on-img-click');
       } else {
-        this.$emit('on-card-click');
+        this.$emit('on-card-click', opt);
       }
     },
     clickCard() {
-      this.$emit('on-card-click');
+      const opt = {
+        id: Number(this.cardItem.id),
+        category: Number(this.cardItem.category),
+        contentId: Number(this.cardItem.content_id),
+      };
+      this.$emit('on-card-click', opt);
     },
     like() {
       this.$emit('click-like');

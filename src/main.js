@@ -15,6 +15,7 @@ import A from './components/A';
 import B from './components/B';
 import C from './components/C';
 import Search from './components/Search';
+import Essay from './components/Essay';
 
 Vue.use(Vuex);
 Vue.use(Lazyload);
@@ -137,6 +138,10 @@ const routes = [
   {
     path: 'right',
     component: B,
+  },
+  {
+    path: '/essay/:id',
+    component: Essay,
   },
 ];
 
