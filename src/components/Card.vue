@@ -118,9 +118,6 @@ export default{
 </script>
 <style lang="scss">
 @import '../styles/rem.scss';
-html {
-  -webkit-text-size-adjust: none;
-}
 .card {
   padding: rem(17) 0 rem(40) 0;
   margin-bottom: rem(30);

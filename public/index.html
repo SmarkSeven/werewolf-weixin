@@ -1,10 +1,47 @@
-<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=0"><title>one</title><link href=/static/css/app.e9d08cc0c2f7cc8844caccb7a5a458c4.css rel=stylesheet></head><body><div id=app-box></div><script src=https://www.gstatic.com/firebasejs/3.7.2/firebase.js></script><script>// Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyChSISqvhv-7lmtX86J-YjTvqL0T6l7Pxc",
-        authDomain: "one-1-a03b6.firebaseapp.com",
-        databaseURL: "https://one-1-a03b6.firebaseio.com",
-        storageBucket: "one-1-a03b6.appspot.com",
-        messagingSenderId: "10986861641"
-      };
-      firebase.initializeApp(config);
-      var database = firebase.database();</script><script type=text/javascript src=/static/js/manifest.21d3c2505079093707a4.js></script><script type=text/javascript src=/static/js/vendor.dd27161463db1f141844.js></script><script type=text/javascript src=/static/js/app.29dbaa5dd98d2ff00cb7.js></script></body></html>
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=0"><title>one</title><link href=/static/css/app.da79961fcf8c78d50c61f6f571d8367b.css rel=stylesheet></head><body><div id=app-box></div><script type=text/javascript src=/static/js/manifest.fdce98c5da6b2b336e57.js></script><script type=text/javascript src=/static/js/vendor.f63751ec96c5c8ba9c7e.js></script><script type=text/javascript src=/static/js/app.47ce748cb2d77aea79c6.js></script></body><script>;
+ (function(win) {
+     var doc = win.document;
+     var docEl = doc.documentElement;
+     var metaEl = doc.querySelector('meta[name="viewport"]');
+     var scale = 1;
+     var tid;
+     if (!metaEl) {
+         metaEl = doc.createElement('meta');
+         metaEl.setAttribute('name', 'viewport');
+         metaEl.setAttribute('content', 'width=device-width, initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no');
+         if (docEl.firstElementChild) {
+             docEl.firstElementChild.appendChild(metaEl);
+         } else {
+             var wrap = doc.createElement('div');
+             wrap.appendChild(metaEl);
+             doc.write(wrap.innerHTML);
+         }
+     }
+
+     function refreshRem() {
+         var width = docEl.clientWidth;
+         var rem = width;
+         docEl.style.fontSize = rem + 'px';
+     }
+
+     win.addEventListener('resize', function() {
+         clearTimeout(tid);
+         tid = setTimeout(refreshRem, 300);
+     }, false);
+     win.addEventListener('pageshow', function(e) {
+         if (e.persisted) {
+             clearTimeout(tid);
+             tid = setTimeout(refreshRem, 300);
+         }
+     }, false);
+
+     if (doc.readyState === 'complete') {
+         doc.body.style.fontSize = 12 + 'px';
+     } else {
+         doc.addEventListener('DOMContentLoaded', function(e) {
+             doc.body.style.fontSize = 12 + 'px';
+         }, false);
+     }
+
+     refreshRem();
+ })(window);</script></html>
