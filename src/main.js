@@ -27,6 +27,10 @@ const one = {
     host: 'http://v3.wufazhuce.com:8000/api',
     basicQueryString: 'channel=pp&version=4.0.7&uuid=00000000-41eb-998f-dab4-6c1045072748&platform=android',
     weather: null,
+    lastReadingId: 0,
+    lastMusicId: 0,
+    lastMovieId: 0,
+    maxIndex: 0,
     currentIndex: -1,
     oneIdList: [],
     oneList: [],
@@ -35,6 +39,15 @@ const one = {
     movieList: [],
   },
   mutations: {
+    updateLastReadingId(state, payload) {
+      state.lastReadingId = payload.lastReadingId;
+    },
+    updateLastMusicId(state, payload) {
+      state.lastMusicId = payload.lastMusicId;
+    },
+    updateLastMovieId(state, payload) {
+      state.lastMovieId = payload.lastMovieId;
+    },
     updateWeather(state, payload) {
       state.weather = payload.weather;
     },
@@ -44,17 +57,20 @@ const one = {
     updateCurrentIndex(state, payload) {
       state.currentIndex = payload.currentIndex;
     },
+    updateMaxIndex(state, payload) {
+      state.maxIndex = payload.maxIndex;
+    },
     updateOneList(state, payload) {
       state.oneList = payload.oneList;
     },
     pushReadingList(state, payload) {
-      state.readingList.push(payload.readingList);
+      state.readingList.push(...payload.readingList);
     },
     pushMusicList(state, payload) {
-      state.musicList.push(payload.musicList);
+      state.musicList.push(...payload.musicList);
     },
     pushMovieList(state, payload) {
-      state.movieList.push(payload.movieList);
+      state.movieList.push(...payload.movieList);
     },
   },
   actions: {},
@@ -91,7 +107,7 @@ const routes = [
     component: Home,
   },
   {
-    path: '/read',
+    path: '/reading',
     component: Home,
   },
   {

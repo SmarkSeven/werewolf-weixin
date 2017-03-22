@@ -12,8 +12,8 @@ export default function getDateDiff(dateTimeStamp) {
   // const months = diffValue / month;
   // const weeks = diffValue / (7 * day);
   const days = diffValue / day;
-  // const hours = diffValue / hour;
-  // const mins = diffValue / minute;
+  const hours = diffValue / hour;
+  const mins = diffValue / minute;
   let result = '';
   // if (months >= 1) {
   //   result = `${Math.floor(months)}月前`;
@@ -23,11 +23,11 @@ export default function getDateDiff(dateTimeStamp) {
   if (days > 3) {
     result = `${today.getDate()} ${monthArr[today.getMonth()]}.${today.getFullYear()}`;
   } else if (days > 0.5) {
-    result = `${Math.ceil(days)}天前`;
-  // } else if (hours >= 1) {
-    // result = `${Math.floor(hours)}小时前`;
-  // } else if (mins >= 1) {
-  //   result = `${Math.floor(mins)}分钟前`;
+    result = `${parseInt(`${days}`, 10)}天前`;
+  } else if (hours >= 1) {
+    result = `${Math.floor(hours)}小时前`;
+  } else if (mins >= 1) {
+    result = `${Math.floor(mins)}分钟前`;
   } else {
     result = '今天';
   }
