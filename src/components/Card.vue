@@ -5,10 +5,20 @@
     <!--标题-->
     <p class="title">{{cardItem.title}}</p>
     <span class="author">{{author}}</span>
-    <div class="inner-box" @click.stop="clickImg">
+    <div v-if="cardItem.category === '4'" class="music-box">
+      <div class="music-box-left">
+        <div class="music-img-box">
+          <img class="music-img" v-lazy="cardItem.img_url"></img>
+        </div>
+         <img class="music-xiami" src="../assets/xiami_logo.png" alt="">
+         <div :class="{'music-play-btn':!playing, 'music-pause-btn': playing}" @click="play"></div>
+      </div>
+      <div class="music-box-right"><img src="../assets/feeds_music_story.png" class="music-story" alt="music-story"></div>
+    </div>
+    <div v-else class="inner-box" @click.stop="clickImg">
         <img class="img" v-lazy="cardItem.img_url">
     </div>
-    <p v-show="cardItem.category === '0'" class="label pic-info">{{cardItem.title}} | {{cardItem.pic_info}}</p>
+    <p v-show="cardItem.category === '0' || cardItem.category === '4'" class="label info">{{info}}</p>
     <p class="forward" :class="{'forward-bottom': cardItem.category != 5}" v-html="forward"></p>
     <p v-show="cardItem.category === '5'" class="movie-subtitle">——《{{cardItem.subtitle}}》</p>
     <p v-show="cardItem.category === '0'" class="label words-info">{{cardItem.words_info}}</p>
@@ -26,6 +36,12 @@ import { mapState } from 'vuex';
 import getDateDiff from '../js/date.js';
 
 export default{
+  data() {
+    return {
+      playing: false,
+      musicStoryBgUrl: '../assets/feeds_music_story.png',
+    };
+  },
   props: {
     cardItem: Object,
   },
@@ -84,8 +100,22 @@ export default{
       const forward = this.cardItem.forward.replace(/\r\n/g, '<br>');
       return forward;
     },
+    info() {
+      const cardItem = this.cardItem;
+      if (cardItem.category === '4') {
+        const author = cardItem.audio_author;
+        const subtitle = cardItem.subtitle;
+        const audioAlbum = cardItem.audio_album;
+        return `${subtitle} · ${author} | ${audioAlbum}`;
+      }
+      return `${cardItem.title} | ${cardItem.pic_info}`;
+    },
   },
   methods: {
+    play() {
+      console.log('音乐 走！');
+      this.playing = !this.playing;
+    },
     clickImg() {
       const opt = {
         id: Number(this.cardItem.id),
@@ -118,6 +148,9 @@ export default{
 </script>
 <style lang="scss">
 @import '../styles/rem.scss';
+html {
+  -webkit-text-size-adjust: none;
+}
 .card {
   padding: rem(17) 0 rem(40) 0;
   margin-bottom: rem(30);
@@ -206,13 +239,15 @@ export default{
       background-size: 108%;
       &:before {
         position: absolute;
-        content: '';
-        height: rem(8);
-        width: rem(8);
+        content: '·';
+        height: rem(18);
+        width: rem(18);
         left: rem(-66);
-        top: rem(38);
-        background-color: black;
-        transform:rotate(45deg);
+        top: rem(32);
+        line-height: rem(18);
+        font-size: 16px;
+        font-weight: bold;
+        color: hsla(0, 10%, 0%, .25);
       }
     }
   }
@@ -222,19 +257,19 @@ export default{
   }
   .label {
     color: hsla(0, 90%, 0%, .3);
-    font-weight: 700;
+    font-weight: 500;
   }
 }
 .hp-card {
   .title, .author {
     display: none;
   }
-  .pic-info, .words-info {
+  .info, .words-info {
     text-align: center;
     -webkit-transform: scale(0.75);
     font-size: 12px;
   }
-  .pic-info {
+  .nfo {
     margin-top: rem(-8);
   }
   .words-info {
@@ -247,6 +282,95 @@ export default{
   .img {
     width: 100%;
     height: auto;
+  }
+}
+.music-card {
+  .info {
+    padding-top: rem(20);
+    padding-left: rem(80);
+    -webkit-transform-origin-x: 0;
+    -webkit-transform: scale(0.85);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .music-box {
+    display: flex;
+    height: rem(725);
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin-top: rem(30);
+  }
+  .music-box-left {
+    position: relative;
+    height: 100%;
+    width: rem(900);
+    border-top-right-radius: rem(362.5);
+    border-bottom-right-radius: rem(362.5);
+    box-shadow: rem(8) rem(6) rem(15) rgb(246, 246, 246), rem(4) rem(-4) rem(20) rgb(246, 246, 246);
+    background-color: white;
+    .music-img-box {
+      float: right;
+      height: rem(680);
+      width: rem(680);
+      margin-top: rem(22.5);
+      margin-right: rem(25);
+      border-radius: 50%;
+      overflow: hidden;
+      .music-img {
+        height: 100%;
+        width: auto;
+      }
+    }
+    .music-xiami {
+      position: absolute;
+      height: rem(75);
+      width: rem(75);
+      left: rem(120);
+      bottom: rem(25);
+      border-radius: rem(10);
+    }
+    .music-play-btn, .music-pause-btn {
+      position: absolute;
+      height: rem(91);
+      width: rem(91);
+      top: rem(317);
+      right: rem(318);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .6);
+    }
+    .music-play-btn {
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: rem(22.6);
+        left: rem(32);
+        border-top: rem(25) solid transparent;
+        border-right: rem(36) solid transparent;
+        border-bottom: rem(22.5) solid transparent;
+        border-left: rem(36) solid white;
+      }
+    }
+    .music-pause-btn {
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        height: rem(43);
+        width: rem(9);
+        top: rem(24.6);
+        left: rem(28);
+        border-right: rem(15) solid white;
+        border-left: rem(15) solid white;
+      }
+    }
+  }
+  .music-box-right {
+    width: rem(180);
+    padding-left: rem(9);
+    .music-story {
+      height: 100%;
+    }
   }
 }
 .movie-card {

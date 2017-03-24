@@ -1,6 +1,6 @@
 const monthArr = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-export default function getDateDiff(dateTimeStamp) {
+export default function getDateDiff(dateTimeStamp, isUTC) {
   const minute = 1000 * 60;
   const hour = minute * 60;
   const day = hour * 24;
@@ -20,9 +20,11 @@ export default function getDateDiff(dateTimeStamp) {
   // }else if (weeks >= 1) {
     // result = `${Math.floor(months)}周前`;
   // }
-  if (days > 3) {
+  if (isUTC) {
+    return `${today.getDate()} ${monthArr[today.getMonth()]}.${today.getFullYear()}`;
+  } else if (days > 3) {
     result = `${today.getDate()} ${monthArr[today.getMonth()]}.${today.getFullYear()}`;
-  } else if (days > 0.5) {
+  } else if (days >= 1) {
     result = `${parseInt(`${days}`, 10)}天前`;
   } else if (hours >= 1) {
     result = `${Math.floor(hours)}小时前`;

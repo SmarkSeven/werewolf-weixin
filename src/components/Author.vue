@@ -1,7 +1,7 @@
 <template>
 <div id="author-cell">
   <p class="author-label">作者</p>
-  <div class="author-info">
+  <div class="author-info" @click="onClick">
       <div class="author-avtor">
         <img :src="author.web_url" alt="avtor">
       </div>
@@ -31,6 +31,9 @@ export default{
     },
   },
   methods: {
+    onClick() {
+      this.$emit('on-click-item', this.author.user_id);
+    },
     follow() {
       if (this.author.is_settled !== '0') {
         // 取消关组
@@ -46,7 +49,7 @@ export default{
 <style lang="scss">
 @import '../styles/rem.scss';
 #author-cell {
-  height: rem(260);
+  margin:0 rem(63) rem(70) rem(65);
   padding-left: rem(5);
   .author-label {
     height: rem(75);
@@ -76,13 +79,18 @@ export default{
       }
     }
     .author-introduce {
-      position: relative;
-      margin-left: rem(25);
-      top: rem(-20);
+      margin-left: rem(35);
+      top: rem(-15);
       height: rem(120);
+      p {
+        width: rem(750);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
       .author-name {
-        font-size: 12.8px;
-        line-height: 12.8px;
+        font-size: 12.4px;
+        line-height: 1.12;
         font-weight: 600;
         span {
           display: inline-block;
@@ -102,20 +110,20 @@ export default{
     }
     .btn-follow {
         position: absolute;
-        top: rem(20);
+        top: rem(10);
         right: rem(3);
-        padding: rem(10) rem(40);
+        padding: rem(12) rem(45);
         text-align: center;
         line-height: rem(60);
         font-size: 12px;
-        -webkit-transform: scale(0.66);
+        -webkit-transform: scale(0.74);
         -webkit-transform-origin-x: 0;
         font-weight: 700;
         border-radius: rem(10);
         border: rem(2) solid rgb(138,138,138);
       }
     .followed {
-      padding: rem(10) rem(22);
+      padding: rem(12) rem(25);
       color: white;
       background: hsla(0, 90%, 0%, .65);
       font-weight: 600;

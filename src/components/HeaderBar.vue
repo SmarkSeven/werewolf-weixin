@@ -38,7 +38,7 @@ export default {
     title: {
       type: String,
       default() {
-        return 'H';
+        return '';
       },
     },
     transition: String,
@@ -70,7 +70,9 @@ export default {
   position: fixed;
   padding: 3px 0;
   box-sizing: border-box;
-  background-color: floralwhite;
+  color: hsla(0, 0%, 10%, .25);
+  background-color: white;
+  box-shadow: 0 rem(2) rem(1) rem(2) whitesmoke;
   width: 100%;
   z-index: 99;
 }
@@ -85,7 +87,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #999999;
 }
 .header .header-title > span {
   display: inline-block;
@@ -97,7 +98,6 @@ export default {
   display: block;
   font-size: 14px;
   line-height: 21px;
-  color: #999999;
 }
 .header .header-left a,.header .header-left button,.header .header-right a,.header .header-right button {
   float: left;
