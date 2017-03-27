@@ -7,7 +7,7 @@
       </div>
       <div class="author-introduce">
         <p class="author-name">{{author.user_name}} <span class="web-name"> {{author.wb_name}}</span></p>
-        <p class="author-desc">{{author.desc}}</p>
+        <p class="author-desc">{{author.summary}}</p>
       </div>
       <div class="btn-follow" :class="{'followed': isFollowe}" @click="follow">{{followBtnText}}</div>
   </div>
@@ -90,8 +90,8 @@ export default{
       }
       .author-name {
         font-size: 12.4px;
-        line-height: 1.12;
-        font-weight: 600;
+        line-height: 1.2;
+        font-weight: 500;
         span {
           display: inline-block;
           font-size: 11px;
@@ -105,7 +105,7 @@ export default{
         font-size: 12px;
         -webkit-transform-origin-x: 0;
         -webkit-transform: scale(0.76);
-        font-weight: 700;
+        font-weight: 600;
       }
     }
     .btn-follow {

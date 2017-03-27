@@ -2,33 +2,70 @@
 <div class="page-footer">
   <div class="page-footer-left">
     <div class="page-footer-collect" @click="collect"></div>
-    <div class="page-footer-like" @click="like"></div>
+    <div class="page-footer-like" :class="{'page-footer-liked': isPraised}" @click="like"></div>
     <div class="page-footer-comment" @click="comment"></div>
   </div>
   <div class="page-footer-right">
-    <div class="page-footer-like-count"><span>{{likeCount}}</span>喜欢</div>
-    <div class="page-footer-comment-count" @click="cliclComentLabel"><span>{{commentCount}}</span>评论</div>
+    <div class="page-footer-like-count"><span>{{praisenum}}</span>喜欢</div>
+    <div class="page-footer-comment-count" @click="cliclComentLabel"><span>{{commentnum}}</span>评论</div>
   </div>
 </div>
 </template>
 <script>
+import { mapState, mapActions } from 'vuex';
+
 export default {
+  data() {
+    return {
+      increment: 0,
+    };
+  },
   props: {
-    commentCount: {
-      type: Number,
-      default: 0,
+    data: {
+      type: Object,
     },
-    likeCount: {
-      type: Number,
-      default: 0,
+  },
+  computed: {
+    ...mapState({
+      praiseContents: state => state.storage.praiseContents,
+      currentItemCateogry: state => state.one.currentItemCateogry,
+    }),
+    praisenum() {
+      return this.data && (this.data.praisenum + this.increment);
+    },
+    commentnum() {
+      return this.data && this.data.commentnum;
+    },
+    isPraised() {
+      if (this.data) {
+        const index = this.praiseContents.indexOf(Number(this.data.contentId));
+        if (index > -1) {
+          return true;
+        }
+        return false;
+      }
+    },
+    praiseData() {
+      return {
+        id: Number(this.data.id),
+        category: Number(this.currentItemCateogry),
+        contentId: Number(this.data.contentId),
+        storyId: Number(this.data.movieStoryId),
+      };
     },
   },
   methods: {
+    ...mapActions(['praise']),
     collect() {
       this.$emit('on-collect');
     },
     like() {
-      this.$emit('on-like');
+      if (this.isPraised) {
+        this.increment -= 1;
+      } else {
+        this.increment = 1;
+      }
+      this.praise(this.praiseData);
     },
     comment() {
       this.$emit('on-comment');
@@ -68,6 +105,9 @@ export default {
     }
     .page-footer-like {
       background-image: url('../assets/bubble_like.png');
+    }
+    .page-footer-liked {
+       background-image: url('../assets/bubble_liked.png');
     }
     .page-footer-comment {
       background-image: url('../assets/comment_image.png');

@@ -9,6 +9,7 @@ var opn = require('opn')
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
+var bodyParser = require('body-parser')
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
@@ -63,6 +64,13 @@ app.use(hotMiddleware)
 // serve pure static assets
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
+
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+app.post('/praise/add', urlencodedParser, function (req, res) {
+});
+
+app.post('/movie/praisestory', urlencodedParser, function (req, res) {
+});
 
 var uri = 'http://localhost:' + port
 

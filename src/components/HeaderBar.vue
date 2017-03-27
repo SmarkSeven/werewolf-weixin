@@ -68,19 +68,18 @@ export default {
 @import '../styles/rem.scss';
 .header {
   position: fixed;
-  padding: 3px 0;
+  width: 100%;
   box-sizing: border-box;
   color: hsla(0, 0%, 10%, .25);
   background-color: white;
   box-shadow: 0 rem(2) rem(1) rem(2) whitesmoke;
-  width: 100%;
   z-index: 99;
 }
 .header .header-title,.header h1 {
   margin: 0 88px;
-  line-height: 40px;
+  line-height: 46px;
   text-align: center;
-  height: 40px;
+  height: 46px;
   font-size: 18px;
   font-weight: 400;
   width: auto;
@@ -94,21 +93,16 @@ export default {
 
 .header .header-left,.header .header-right {
   position: absolute;
-  top: 14px;
   display: block;
   font-size: 14px;
   line-height: 21px;
 }
 .header .header-left a,.header .header-left button,.header .header-right a,.header .header-right button {
   float: left;
-  margin-right: 16px;
   color: black;
 }
 .header .header-left a:active,.header .header-left button:active,.header .header-right a:active,.header .header-right button:active {
   opacity: .5
-}
-.header .header-left {
-  left: 12px
 }
 .header .header-left .header-back {
   padding-left: 16px
@@ -132,7 +126,11 @@ export default {
  }
 }
 .header .header-right {
-  right: 10px
+  position: absolute;
+  top: 0;
+  right: 10px;
+  height: 46px;
+  line-height: 46px;
 }
 .header .header-right a,.header .header-right button {
   margin-left: 8px;

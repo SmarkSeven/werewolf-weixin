@@ -1,7 +1,8 @@
 <template>
   <div id="home-container">
-      <header-bar slot="header" title="text">
-        <div slot="left" @click="toProfile">GO</div>
+      <header-bar slot="header" title="one">
+        <img src="../assets/individual_center.png" alt="profile" slot="left" @click="toProfile">
+
         <div slot="right" @click="toSearch">Search</div>
       </header-bar>
       <loadmore id="load-more" style="padding-top: 46px;padding-bottom: 50px;" :auto-fill="false" :bottomAllLoaded="allLoaded" :top-method="loadTop" :bottom-method="loadBottom" ref="loadmore">
@@ -38,7 +39,7 @@
 
 <script>
 import { ViewBox, Scroller, ButtonTab, ButtonTabItem, Spinner, Group, Cell, Tabbar, TabbarItem } from 'vux';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 import { Loadmore } from 'mint-ui';
 import HeaderBar from './HeaderBar';
 import Card from './Card';
@@ -67,6 +68,7 @@ export default {
     ...mapState({
       path: state => state.route.path,
       host: state => state.one.host,
+      jwt: state => state.one.jwt,
       basicQueryString: state => state.one.basicQueryString,
       lastReadingId: state => state.one.lastReadingId,
       lastMusicId: state => state.one.lastMusicId,
@@ -79,6 +81,7 @@ export default {
       readingList: state => state.one.readingList,
       musicList: state => state.one.musicList,
       movieList: state => state.one.movieList,
+      praiseContents: state => state.storage.praiseContents,
     }),
     data() {
       switch (this.path) {
@@ -147,11 +150,43 @@ export default {
       'pushReadingList',
       'pushMusicList',
       'pushMovieList',
+      'pushPraiseContentId',
+      'deletePraiseContentId',
+      'updatePraisenum',
     ]),
-    showPage(opt) {
-      if (opt.category === 1) {
-        this.$router.push({ path: `/essay/${opt.contentId}` });
+    ...mapActions(['praise']),
+    type(category) {
+      switch (category) {
+        case 0: // 绘画
+          return 'hpcontent';
+        case 1: // 阅读
+          return 'essay';
+        case 2: // 连载
+          return 'serial';
+        case 3: // 问答
+          return 'question';
+        case 4: // 音乐
+          return 'music';
+        case 5: // 电影
+          return 'movie';
+        default:
+          return '';
       }
+    },
+    showPage(cardInfo) {
+      let path = '';
+      if (cardInfo.category === 0) {
+        return;
+      } else if (cardInfo.category === 1) { // 前往阅读视图
+        path = 'essay';
+      } else if (cardInfo.category === 3) { // 前往问答视图
+        path = 'question';
+      } else if (cardInfo.category === 4) { // 前往音乐视图
+        path = 'music';
+      } else if (cardInfo.category === 5) {
+        path = 'movie';
+      }
+      this.$router.push({ path: `/${path}/${cardInfo.contentId}` });
     },
     showImg() {
       console.log('show img');
@@ -171,8 +206,25 @@ export default {
     toSearch() {
       this.$router.push('search');
     },
-    like() {
-      console.log('like');
+    like(cardInfo) {
+      let category;
+      const path = this.path;
+      if (path === '/') {
+        category = 0;
+      } else if (path === '/reading') {
+        category = 1;
+      } else if (path === '/music') {
+        category = 4;
+      } else {
+        category = 5;
+      }
+      const praisePayload = {
+        id: cardInfo.id,
+        category,
+        contentId: cardInfo.contentId,
+        storyId: cardInfo.storyId,
+      };
+      this.praise(praisePayload);
     },
     share() {
       console.log('I want to share it whith my freinds.');
@@ -235,7 +287,7 @@ export default {
         this.pushMusicList({ musicList: result.data });
         const listLen = this.musicList.length;
         // 记录最后一条音乐数据的ID
-        this.updateLastMovieId({ lastMusicId: this.musicList[listLen - 1].id });
+        this.updateLastMusicId({ lastMusicId: this.musicList[listLen - 1].id });
       }
     },
     async fetchMovieData() {
@@ -254,13 +306,19 @@ export default {
 };
 </script>
 
-<style rel="stylesheet/scss">
+<style lang="scss">
 @import '../styles/rem.scss';
 html, body {
   height: 100%;
 }
 #home-container {
   height: 100%;
+  .header {
+   img {
+    height: 46px;
+    width: 46px;
+  }
+  }
 }
 .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label span {
   color: hsla(0, 100%, 10%, .7);

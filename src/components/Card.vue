@@ -26,13 +26,13 @@
       <div v-show="cardItem.category != '0'" class="date label">{{date}}</div>
       <div class="share-btn" @click.stop="share">
       </div>
-      <div class="like-btn" @click.stop="like"></div>
+      <div class="like-btn" @click.stop="like" :class="{'liked': isPraised}"></div>
       <div class="like-num label">{{cardItem.like_count}}</div>
     </div>
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import getDateDiff from '../js/date.js';
 
 export default{
@@ -48,10 +48,11 @@ export default{
   computed: {
     ...mapState({
       weather: state => state.one.weather,
+      praiseContents: state => state.storage.praiseContents,
     }),
     tag() {
       const tag = this.cardItem.tag_list[0];
-      switch (this.cardItem.category) {
+      switch (this.cardItem.content_type) {
         case '1':
           return `- ${tag ? tag.title : '阅读'} -`;
         case '2':
@@ -70,7 +71,7 @@ export default{
     },
     author() {
       let name = this.cardItem.author.user_name;
-      const category = this.cardItem.category;
+      const category = this.cardItem.content_type;
       if (category === '3') {
         name = this.cardItem.answerer.user_name;
         return `${name}答`;
@@ -78,7 +79,7 @@ export default{
       return `文╱${name}`;
     },
     cardType() {
-      switch (this.cardItem.category) {
+      switch (this.cardItem.content_type) {
         case '0': // 绘画
           return 'hp-card';
         case '1': // 阅读
@@ -93,6 +94,13 @@ export default{
           return '';
       }
     },
+    isPraised() {
+      const index = this.praiseContents.indexOf(Number(this.cardItem.content_id));
+      if (index > -1) {
+        return true;
+      }
+      return false;
+    },
     date() {
       return getDateDiff(new Date(this.cardItem.post_date).getTime());
     },
@@ -104,43 +112,73 @@ export default{
       const cardItem = this.cardItem;
       if (cardItem.category === '4') {
         const author = cardItem.audio_author;
-        const subtitle = cardItem.subtitle;
+        const musicName = cardItem.music_name;
         const audioAlbum = cardItem.audio_album;
-        return `${subtitle} · ${author} | ${audioAlbum}`;
+        return `${musicName} · ${author} | ${audioAlbum}`;
       }
       return `${cardItem.title} | ${cardItem.pic_info}`;
     },
+    musicId() {
+      const cardItem = this.cardItem;
+      if (cardItem.category === '4') {
+        return cardItem.audio_url;
+      }
+    },
+    cardInfo() {
+      return {
+        id: Number(this.cardItem.id),
+        category: Number(this.cardItem.content_type),
+        contentId: Number(this.cardItem.content_id),
+        storyId: Number(this.cardItem.movie_story_id),
+      };
+    },
   },
   methods: {
+    ...mapMutations([
+      'updateMusicId',
+      'updateMusicTitle',
+      'updateMusicName',
+      'updateAudioAuthor',
+      'updateAudioAlbum',
+      'updateWordsAuthor',
+      'updateQuestionId',
+      'updateReadingAuthorName',
+      'updateCurrentItemCategory']),
     play() {
       console.log('音乐 走！');
       this.playing = !this.playing;
     },
     clickImg() {
-      const opt = {
-        id: Number(this.cardItem.id),
-        category: Number(this.cardItem.category),
-        contentId: Number(this.cardItem.content_id),
-      };
       if (this.cardItem === '0') {
         this.$emit('on-img-click');
       } else {
-        this.$emit('on-card-click', opt);
+        this.clickCard();
       }
     },
     clickCard() {
-      const opt = {
-        id: Number(this.cardItem.id),
-        category: Number(this.cardItem.category),
-        contentId: Number(this.cardItem.content_id),
-      };
-      this.$emit('on-card-click', opt);
+      const cardItem = this.cardItem;
+      this.updateCurrentItemCategory({ currentItemCateogry: cardItem.content_type });
+      if (cardItem.content_type === '4') {
+        this.updateMusicId({ musicId: Number(this.musicId) });
+        this.updateMusicName({ musicName: cardItem.music_name });
+        this.updateAudioAuthor({ audioAuthor: cardItem.audio_author });
+        this.updateMusicTitle({ title: cardItem.title });
+        this.updateAudioAlbum({ audioAlbum: cardItem.audio_album });
+        this.updateWordsAuthor({ author: this.author });
+      }
+      if (cardItem.content_type === '3') {
+        this.updateQuestionId({ questionId: cardItem.question_id });
+      }
+      if (cardItem.content_type === '1' && this.cardItem.tag_list.length === 0) {
+        this.updateReadingAuthorName({ authorName: cardItem.author.user_name });
+      }
+      this.$emit('on-card-click', this.cardInfo);
     },
     like() {
-      this.$emit('click-like');
+      this.$emit('click-like', this.cardInfo);
     },
     share() {
-      this.$emit('click-share');
+      this.$emit('click-share', this.cardInfo);
     },
   },
 };
@@ -166,9 +204,9 @@ html {
   .title {
     padding: 0 rem(77);
     margin-bottom: rem(20);
-    line-height: rem(70);
+    line-height: rem(78);
     font-size: 19px;
-    font-weight: 500;
+    font-weight: 600;
   }
   .author {
     display: inline-block;
@@ -229,6 +267,9 @@ html {
       width: rem(80);
       background-image: url('../assets/bubble_like.png');
       background-size: 108%;
+    }
+    .liked {
+      background-image: url('../assets/bubble_liked.png');
     }
     .share-btn {
       position: relative;

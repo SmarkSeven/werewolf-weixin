@@ -2,7 +2,7 @@
 <div class="related" @click="onClick">
   <div class="related-content">
     <div class="related-tag">{{tag}}</div>
-    <div class="related-title">{{related.hp_title}}</div>
+    <div class="related-title">{{title}}</div>
   </div>
   <p class="related-author">{{author}}</p>
 </div>
@@ -15,12 +15,33 @@ export default {
   },
   computed: {
     author() {
-      return `文╱${this.related.author[0].user_name}`;
+      switch (this.tag) {
+        case '问答':
+          return this.related.answer_title;
+        default:
+          return `文╱${this.related.author[0].user_name}`;
+      }
+    },
+    title() {
+      switch (this.tag) {
+        case '问答':
+          return this.related.question_title;
+        default:
+          return this.related.hp_title;
+      }
     },
   },
   methods: {
     onClick() {
-      this.$emit('on-clicke-item', this.related.content_id);
+      let id;
+      switch (this.tag) {
+        case '问答':
+          id = this.related.question_id;
+          break;
+        default:
+          id = this.related.content_id;
+      }
+      this.$emit('on-clicke-item', id);
     },
   },
 };
