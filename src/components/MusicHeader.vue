@@ -1,7 +1,7 @@
 <template>
   <div class="music-header">
     <div class="music-header-box" @click="showDetail">
-      <img class="music-header-img" :src="cover" alt="allbum-imgs">
+      <img class="music-header-img" :src="cover"  alt="allbum-imgs">
       <img class="muisc-header-xiami" src="../assets/xiami_logo.png" alt="xiami-logo">
       <div :class="{'music-header-play-btn': !playing ,'music-header-pause-btn': playing}" @click.stop="play"></div>
     </div>
@@ -78,7 +78,7 @@ export default {
       top: rem(565);
       right: rem(565);
       border-radius: 50%;
-      background: rgba(255, 255, 255, .6);
+      background: rgba(250, 250, 250, .62);
       &:after {
         content: '';
         display: block;

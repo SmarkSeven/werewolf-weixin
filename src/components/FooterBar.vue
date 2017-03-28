@@ -1,7 +1,7 @@
 <template>
 <div class="page-footer">
-  <div class="page-footer-left">
-    <div class="page-footer-collect" @click="collect"></div>
+  <div class="page-footer-left" v-if="data">
+    <div class="page-footer-collect" @click="onCollectClick" :class="{'page-footer-collected': isCollected}"></div>
     <div class="page-footer-like" :class="{'page-footer-liked': isPraised}" @click="like"></div>
     <div class="page-footer-comment" @click="comment"></div>
   </div>
@@ -13,8 +13,12 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex';
+import { Toast } from 'mint-ui';
 
 export default {
+  components: {
+    Toast,
+  },
   data() {
     return {
       increment: 0,
@@ -28,7 +32,8 @@ export default {
   computed: {
     ...mapState({
       praiseContents: state => state.storage.praiseContents,
-      currentItemCateogry: state => state.one.currentItemCateogry,
+      collection: state => state.storage.collection,
+      currentItemCategory: state => state.one.currentItemCategory,
     }),
     praisenum() {
       return this.data && (this.data.praisenum + this.increment);
@@ -37,27 +42,37 @@ export default {
       return this.data && this.data.commentnum;
     },
     isPraised() {
-      if (this.data) {
-        const index = this.praiseContents.indexOf(Number(this.data.contentId));
-        if (index > -1) {
-          return true;
-        }
-        return false;
+      const index = this.praiseContents.indexOf(Number(this.data.contentId));
+      if (index > -1) {
+        return true;
       }
+      return false;
+    },
+    isCollected() {
+      const index = this.collection.indexOf(Number(this.data.contentId));
+      if (index > -1) {
+        return true;
+      }
+      return false;
     },
     praiseData() {
       return {
         id: Number(this.data.id),
-        category: Number(this.currentItemCateogry),
+        category: Number(this.currentItemCategory),
         contentId: Number(this.data.contentId),
         storyId: Number(this.data.movieStoryId),
       };
     },
   },
   methods: {
-    ...mapActions(['praise']),
-    collect() {
-      this.$emit('on-collect');
+    ...mapActions(['praise', 'collect']),
+    onCollectClick() {
+      this.collect(this.praiseData);
+      Toast({
+        message: '已收藏，可至个人中心收藏中查看',
+        position: 'bottom',
+        duration: 1200,
+      });
     },
     like() {
       if (this.isPraised) {
@@ -71,7 +86,11 @@ export default {
       this.$emit('on-comment');
     },
     cliclComentLabel() {
-      this.$emit('on-comment-label');
+      const body = document.querySelector('body');
+      const commentElem = document.querySelector('#comment-label');
+      body.scrollTop = commentElem.offsetTop;
+
+      // this.$emit('on-comment-label');
     },
   },
 };
@@ -102,6 +121,10 @@ export default {
     }
     .page-footer-collect {
       background-image: url('../assets/bubble_collect.png');
+      background-size: rem(68) rem(68);
+    }
+    .page-footer-collected {
+       background-image: url('../assets/bubble_collected.png');
     }
     .page-footer-like {
       background-image: url('../assets/bubble_like.png');

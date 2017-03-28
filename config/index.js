@@ -31,7 +31,9 @@ module.exports = {
       '/praise/add': 'http://v3.wufazhuce.com:8000/api',
       '/movie/praisestory': 'http://v3.wufazhuce.com:8000/api',
       '/comment/praise': 'http://v3.wufazhuce.com:8000/api',
-      '/comment/unpraise': 'http://v3.wufazhuce.com:8000/api'
+      '/comment/unpraise': 'http://v3.wufazhuce.com:8000/api',
+      '/collection/add': 'http://v3.wufazhuce.com:8000/api',
+      '/collection/del': 'http://v3.wufazhuce.com:8000/api'
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

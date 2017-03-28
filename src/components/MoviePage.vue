@@ -1,13 +1,13 @@
 <template>
   <div id='movie-page'>
-    <header-bar></header-bar>
+    <header-bar :leftOptions="leftOptions" title="一个影视"></header-bar>
     <movie-header :title="title" :authorName="authorName" :photos="photos"></movie-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
     <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
     <related-label v-if="related.length > 0"></related-label>
     <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
     <comment-label></comment-label>
-    <comment v-for="(comment,index) in comments" :comment="comment" :itemId="movie.movie_id" type="movie" :key="comment.id"></comment>
+    <comment v-for="(comment,index) in comments" :comment="comment" :itemId="itemId" type="movie" :key="comment.id"></comment>
     <footer-bar :data="footerData"></footer-bar>
   </div>
 </template>
@@ -46,6 +46,9 @@ export default{
         sharenum: 0,
         commentnum: 0,
       },
+      leftOptions: {
+        showBack: true,
+      },
     };
   },
   computed: {
@@ -56,6 +59,9 @@ export default{
     }),
     title() {
       return this.movie && this.movie.title;
+    },
+    itemId() {
+      return this.movie && this.movie.movie_id;
     },
     authors() {
       const movie = this.movie;
@@ -71,9 +77,9 @@ export default{
     photos() {
       const movieDetail = this.movieDetail;
       if (movieDetail) {
-        movieDetail.photo.unshift(movieDetail.detailcover);
+        return [movieDetail.detailcover, ...movieDetail.photo];
       }
-      return movieDetail && movieDetail.photo;
+      return [];
     },
     content() {
       return this.movie && this.movie.content.replace(/style="height:\d+px; width:\d+px"/g, '');

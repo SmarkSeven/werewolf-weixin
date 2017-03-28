@@ -157,7 +157,7 @@ export default{
     },
     clickCard() {
       const cardItem = this.cardItem;
-      this.updateCurrentItemCategory({ currentItemCateogry: cardItem.content_type });
+      this.updateCurrentItemCategory({ currentItemCategory: cardItem.content_type });
       if (cardItem.content_type === '4') {
         this.updateMusicId({ musicId: Number(this.musicId) });
         this.updateMusicName({ musicName: cardItem.music_name });

@@ -80,7 +80,7 @@ export default {
   line-height: 46px;
   text-align: center;
   height: 46px;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 400;
   width: auto;
   overflow: hidden;
@@ -111,14 +111,14 @@ export default {
   position: absolute;
   width: 30px;
   height: 30px;
-  top: -5px;
-  left: -5px;
+  top: 8px;
+  left: 10px;
   &:before {
   content: "";
   position: absolute;
   width: 12px;
   height: 12px;
-  border: 1px solid black;
+  border: 1px solid hsla(0, 0%, 10%, .25);;
   border-width: 1px 0 0 1px;
   transform: rotate(315deg);
   top: 8px;

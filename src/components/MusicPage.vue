@@ -1,6 +1,6 @@
 <template>
   <div id="music-page">
-    <header-bar></header-bar>
+    <header-bar :leftOptions="leftOptions" title="一个音乐"></header-bar>
     <music-header :cover="cover"></music-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
     <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
@@ -41,6 +41,9 @@ export default{
       authors: [],
       comments: [],
       related: [],
+      leftOptions: {
+        showBack: true,
+      },
       update: {
         praisenum: 0,
         sharenum: 0,

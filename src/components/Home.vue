@@ -1,6 +1,6 @@
 <template>
   <div id="home-container">
-      <header-bar slot="header" title="one">
+      <header-bar slot="header" :title="title">
         <img src="../assets/individual_center.png" alt="profile" slot="left" @click="toProfile">
 
         <div slot="right" @click="toSearch">Search</div>
@@ -83,6 +83,18 @@ export default {
       movieList: state => state.one.movieList,
       praiseContents: state => state.storage.praiseContents,
     }),
+    title() {
+      switch (this.path) {
+        case '/music':
+          return '一个音乐';
+        case '/reading':
+          return '一个阅读';
+        case '/movie':
+          return '一个电影';
+        default:
+          return '一个';
+      }
+    },
     data() {
       switch (this.path) {
         case '/music':

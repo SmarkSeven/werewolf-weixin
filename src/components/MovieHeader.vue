@@ -1,6 +1,6 @@
 <template>
   <div class="movie-header">
-    <swiper  class="movie-swiper" height="220px" v-model="swiperItemIndex" loop :show-dots='false'>
+    <swiper  class="movie-swiper" height="220px" v-model="swiperItemIndex" :show-dots='false'>
       <swiper-item  v-for="(photo, index) in photos" :key="index">
         <img :src="photo">
       </swiper-item>
@@ -14,6 +14,11 @@ import { Swiper, SwiperItem } from 'vux';
 import EssayHeader from './EssayHeader';
 
 export default {
+  data() {
+    return {
+      swiperItemIndex: 0,
+    };
+  },
   components: {
     Swiper,
     SwiperItem,
@@ -28,14 +33,14 @@ export default {
     authorName: String,
   },
   computed: {
-    swiperItemIndex() {
-      if (this.photos) {
-        return this.photos.length - 1;
-      }
-      return 0;
-    },
+    // swiperItemIndex() {
+    //   // if (this.photos) {
+    //   //   return this.photos.length - 1;
+    //   // }
+    //   return 0;
+    // },
     numberIndicator() {
-      return this.photos && `${this.photos.length - this.swiperItemIndex}/${this.photos.length}`;
+      return this.photos && `${this.swiperItemIndex + 1}/${this.photos.length}`;
     },
   },
 };

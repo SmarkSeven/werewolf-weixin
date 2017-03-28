@@ -74,6 +74,10 @@ app.post('/comment/praise', urlencodedParser, function (req, res) {
 });
 app.post('/comment/unpraise', urlencodedParser, function (req, res) {
 });
+app.post('/collection/add', urlencodedParser, function (req, res) {
+});
+app.post('/collection/del', urlencodedParser, function (req, res) {
+});
 
 var uri = 'http://localhost:' + port;
 

@@ -1,6 +1,6 @@
 <template>
   <div id='essay-page'>
-    <header-bar></header-bar>
+    <header-bar :leftOptions="leftOptions" title="一个阅读"></header-bar>
     <essay-header :title="title" :authorName="author"></essay-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
     <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
@@ -40,6 +40,9 @@ export default{
       essay: null,
       comments: [],
       related: [],
+      leftOptions: {
+        showBack: true,
+      },
       update: {
         praisenum: 0,
         sharenum: 0,
