@@ -33,15 +33,28 @@ export default {
     authorName: String,
   },
   computed: {
-    // swiperItemIndex() {
-    //   // if (this.photos) {
-    //   //   return this.photos.length - 1;
-    //   // }
-    //   return 0;
-    // },
     numberIndicator() {
       return this.photos && `${this.swiperItemIndex + 1}/${this.photos.length}`;
     },
+  },
+  created() {
+    // 处理片吗宽度
+    function check(delay) {
+      const imgs = document.querySelectorAll('.movie-swiper img');
+      const timer = setTimeout(check, delay);
+      if (imgs.length > 0) {
+        clearTimeout(timer);
+      }
+      imgs.forEach((img) => {
+        if (img.getBoundingClientRect().width < window.innerWidth) {
+          // img.classList.add('img');
+          // img.style.borderRadius = '50%';
+          img.style.width = window.innerWidth;
+          img.style.height = 'auto';
+        }
+      });
+    }
+    check(200);
   },
 };
 </script>
@@ -52,8 +65,11 @@ export default {
     .movie-swiper {
       padding-top: 46px;
       img {
-        position: relative;
-        max-height: 220px;
+        height: 220px;
+      }
+      .img {
+        width: 100%;
+        height: auto;
       }
      }
     .photo-indicator {
