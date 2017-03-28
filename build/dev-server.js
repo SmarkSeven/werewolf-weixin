@@ -68,11 +68,14 @@ app.use(staticPath, express.static('./static'))
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.post('/praise/add', urlencodedParser, function (req, res) {
 });
-
 app.post('/movie/praisestory', urlencodedParser, function (req, res) {
 });
+app.post('/comment/praise', urlencodedParser, function (req, res) {
+});
+app.post('/comment/unpraise', urlencodedParser, function (req, res) {
+});
 
-var uri = 'http://localhost:' + port
+var uri = 'http://localhost:' + port;
 
 devMiddleware.waitUntilValid(function () {
   console.log('> Listening at ' + uri + '\n')

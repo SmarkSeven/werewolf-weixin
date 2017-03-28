@@ -26,10 +26,39 @@ Vue.use(VueRouter);
 Vue.prototype.$http = axios;
 Vue.use(LoadingPlugin);
 
+function typeHelper(category) {
+  let type;
+  switch (category) {
+    case 0:
+      type = 'hpcontent';
+      break;
+    case 1:
+      type = 'essay';
+      break;
+    case 2:
+      type = 'serial';
+      break;
+    case 3:
+      type = 'question';
+      break;
+    case 4:
+      type = 'music';
+      break;
+    case 5:
+      type = 'movie';
+      break;
+    default:
+  }
+  return type;
+}
+
+// 本地缓存数据
 const storage = {
   state: {
     // 点赞内容ID
     praiseContents: [],
+    // 点赞评论ID
+    praiseComments: [],
   },
   mutations: {
     pushPraiseContentId(state, payload) {
@@ -41,39 +70,37 @@ const storage = {
         state.praiseContents.splice(index, 1);
       }
     },
+    pushPraiseCommentId(state, payload) {
+      state.praiseComments.push(payload.praiseCommentId);
+    },
+    deletePraiseCommentId(state, payload) {
+      const index = state.praiseComments.indexOf(payload.praiseCommentId);
+      if (index > -1) {
+        state.praiseComments.splice(index, 1);
+      }
+    },
   },
   actions: {
+    // 添加或删除点赞内容ID
     async praise({ state, commit, rootState }, payload) {
-      let type;
       let dataSet;
       const contentId = payload.contentId;
       const index = state.praiseContents.indexOf(contentId);
       const updatePraiseContentIdPayload = { contentId };
       const updatePraisenumPayload = { contentId };
-      console.log(payload, payload.category, typeof payload.category);
       switch (payload.category) {
         case 0:
           dataSet = 'oneList';
-          type = 'hpcontent';
           break;
         case 1:
-          dataSet = 'readingList';
-          type = 'essay';
-          break;
         case 2:
-          type = 'serial';
-          dataSet = 'readingList';
-          break;
         case 3:
-          type = 'question';
           dataSet = 'readingList';
           break;
         case 4:
-          type = 'music';
           dataSet = 'musicList';
           break;
         case 5:
-          type = 'movie';
           dataSet = 'movieList';
           break;
         default:
@@ -82,7 +109,6 @@ const storage = {
       if (index > -1) {
         commit('deletePraiseContentId', updatePraiseContentIdPayload);
         updatePraisenumPayload.num = -1;
-        console.log(updatePraisenumPayload);
         commit('updatePraisenum', updatePraisenumPayload);
       } else {
         let path;
@@ -99,14 +125,30 @@ const storage = {
           path = '/praise/add';
           form.itemid = contentId;
           form.cmtid = 0;
-          form.type = type;
+          form.type = typeHelper(payload.category);
         }
         const resp = await axios.post(`${path}?${rootState.one.basicQueryString}`, form);
         if (resp.data.res === 0) {
           commit('pushPraiseContentId', updatePraiseContentIdPayload);
           updatePraisenumPayload.num = 1;
-          console.log(updatePraisenumPayload);
           commit('updatePraisenum', updatePraisenumPayload);
+        }
+      }
+    },
+    // 添加或删除点赞评论ID
+    async praiseComment({ state, commit, rootState }, payload) {
+      const praiseCommentId = payload.cmtid;
+      const index = state.praiseComments.indexOf(praiseCommentId);
+      const updatePraiseCommnetPayload = { praiseCommentId };
+      if (index > -1) {
+        const resp = await axios.post(`/comment/unpraise?${rootState.one.basicQueryString}`, payload);
+        if (resp.data.res === 0) {
+          commit('deletePraiseCommentId', updatePraiseCommnetPayload);
+        }
+      } else {
+        const resp = await axios.post(`/comment/praise?${rootState.one.basicQueryString}`, payload);
+        if (resp.data.res === 0) {
+          commit('pushPraiseCommentId', updatePraiseCommnetPayload);
         }
       }
     },

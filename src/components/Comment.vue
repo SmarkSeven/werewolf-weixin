@@ -16,8 +16,8 @@
   <p class="comment-content">{{comment.content}}</p>
   <footer class="comment-footer">
     <div class="commnet-footer-content">
-      <div class="comment-praise" @click="praise">
-        <span class="comment-praisenum">{{comment.praisenum}}</span>
+      <div class="comment-praise" :class="{'praised': isPraised}" @click="praise">
+        <span class="comment-praisenum">{{praisenum}}</span>
       </div>
       <div class="comment-btn" @click="commitComment"></div>
     </div>
@@ -26,25 +26,66 @@
 </div>
 </template>
 <script>
+import { mapState, mapActions } from 'vuex';
 import getDateDiff from '../js/date.js';
 
 export default {
+  data() {
+    return {
+      increment: 0,
+      variable: 0,
+    };
+  },
   props: {
     comment: Object,
+    type: String,
+    itemId: String,
   },
   computed: {
+    ...mapState({
+      host: state => state.one.host,
+      jwt: state => state.one.jwt,
+      basicQueryString: state => state.one.basicQueryString,
+      praiseComments: state => state.storage.praiseComments,
+    }),
+    isPraised() {
+      const index = this.praiseComments.indexOf(this.comment.id);
+      if (index > -1) {
+        return true;
+      }
+      return false;
+    },
+    praisenum() {
+      return this.comment.praisenum + this.increment;
+    },
+
     commentDate() {
       return getDateDiff(new Date(this.comment.created_at).getTime(), true);
     },
   },
+  created() {
+    if (this.isPraised) {
+      this.variable = -1;
+    }
+  },
   methods: {
+    ...mapActions(['praiseComment']),
     commitComment() {
-      // TODO 回复评论
       console.log('回复评论');
     },
-    praise() {
-      // TODO 点赞或取消
-      console.log('点赞');
+    praise() { // TODO 点赞或取消
+      if (this.isPraised) {
+        this.increment = this.variable;
+      } else {
+        this.increment = 1 + this.variable;
+      }
+      const form = {
+        itemid: this.itemId,
+        cmtid: this.comment.id,
+        jwt: this.jwt,
+        type: this.type,
+      };
+      this.praiseComment(form);
     },
   },
 };
@@ -149,6 +190,9 @@ export default {
         background: url('../assets/comment_laud.png') no-repeat;
         background-size: rem(50) rem(50);
         background-position: rem(28) rem(-5);
+      }
+      .praised {
+        background-image: url('../assets/comment_laud_selected.png');
       }
       .comment-btn {
         width: rem(120);
