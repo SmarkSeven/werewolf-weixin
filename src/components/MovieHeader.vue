@@ -1,7 +1,7 @@
 <template>
   <div class="movie-header">
-    <swiper  class="movie-swiper" height="220px" v-model="swiperItemIndex" :show-dots='false'>
-      <swiper-item  v-for="(photo, index) in photos" :key="index">
+    <swiper  class="movie-swiper" height="200px" v-model="swiperItemIndex" :show-dots='false'>
+      <swiper-item v-for="(photo, index) in photos" :key="index">
         <img :src="photo">
       </swiper-item>
     </swiper>
@@ -38,7 +38,7 @@ export default {
     },
   },
   created() {
-    // 处理片吗宽度
+    // 处理图片宽度
     function check(delay) {
       const imgs = document.querySelectorAll('.movie-swiper img');
       const timer = setTimeout(check, delay);
@@ -46,9 +46,8 @@ export default {
         clearTimeout(timer);
       }
       imgs.forEach((img) => {
-        if (img.getBoundingClientRect().width < window.innerWidth) {
+        if (img.getBoundingClientRect().height < window.innerWidth) {
           // img.classList.add('img');
-          // img.style.borderRadius = '50%';
           img.style.width = window.innerWidth;
           img.style.height = 'auto';
         }
@@ -64,10 +63,11 @@ export default {
     position: relative;
     .movie-swiper {
       padding-top: 46px;
-      img {
-        height: 220px;
+      .vux-swiper-item {
+        overflow: hidden;
+        background-color: black;
       }
-      .img {
+      img {
         width: 100%;
         height: auto;
       }
@@ -75,7 +75,7 @@ export default {
     .photo-indicator {
       position: absolute;
       right: rem(22);
-      top: 246px;
+      top: 226px;
       color: white;
       font-size: 12px;
     }

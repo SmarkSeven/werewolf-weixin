@@ -2,10 +2,9 @@
   <div id="home-container">
       <header-bar slot="header" :title="title">
         <img src="../assets/individual_center.png" alt="profile" slot="left" @click="toProfile">
-
         <div slot="right" @click="toSearch">Search</div>
       </header-bar>
-      <loadmore id="load-more" style="padding-top: 46px;padding-bottom: 50px;" :auto-fill="false" :bottomAllLoaded="allLoaded" :top-method="loadTop" :bottom-method="loadBottom" ref="loadmore">
+      <loadmore class="loadmore" id="load-more" style="padding-top: 46px;padding-bottom: 50px;" :bottomAllLoaded="allLoaded" :top-method="loadTop" :bottom-method="loadBottom" ref="loadmore">
       <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @click-like="like" @on-img-click="showImg" @on-card-click="showPage"></card>
      </loadmore>
       <tabbar>
@@ -325,11 +324,12 @@ html, body {
 }
 #home-container {
   height: 100%;
+  // overflow: hidden;
   .header {
    img {
     height: 46px;
     width: 46px;
-  }
+   }
   }
 }
 .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label span {

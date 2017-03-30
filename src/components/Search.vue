@@ -1,11 +1,12 @@
 <template>
   <div>
-    <question-header ></question-header>
+    <music-player></music-player>
   </div>
 </template>
 
 <script>
 import QuestionHeader from './QuestionHeader';
+import MusicPlayer from './MusicPlayer';
 
 export default{
   data() {
@@ -15,6 +16,10 @@ export default{
   },
   components: {
     QuestionHeader,
+    MusicPlayer,
   },
 };
 </script>
+<style lang="scss">
+
+</style>

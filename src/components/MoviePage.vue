@@ -8,6 +8,7 @@
     <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
     <comment-label></comment-label>
     <comment v-for="(comment,index) in comments" :comment="comment" :itemId="itemId" type="movie" :key="comment.id"></comment>
+    <router-view></router-view>
     <footer-bar :data="footerData"></footer-bar>
   </div>
 </template>
@@ -183,6 +184,7 @@ export default{
       }
     },
     toAuthor() {
+      this.$router.push({ name: 'video' });
     },
     toRelated(relatedId) {
       // 跳转推荐页面

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Toast } from 'mint-ui';
 
 const localStorage = window.localStorage;
 let praiseContents;
@@ -168,10 +169,13 @@ const storage = {
         }
       } else {
         const resp = await axios.post(`/collection/add?${rootState.one.basicQueryString}`, form);
-        console.log('hire 1');
         if (resp.data.res === 0) {
           commit('pushCollection', updatePraiseCommnetPayload);
-          console.log('hire 1', updatePraiseCommnetPayload);
+          Toast({
+            message: '已收藏，可至个人中心收藏中查看',
+            position: 'bottom',
+            duration: 1200,
+          });
         }
       }
     },

@@ -68,11 +68,6 @@ export default {
     ...mapActions(['praise', 'collect']),
     onCollectClick() {
       this.collect(this.praiseData);
-      Toast({
-        message: '已收藏，可至个人中心收藏中查看',
-        position: 'bottom',
-        duration: 1200,
-      });
     },
     like() {
       if (this.isPraised) {
@@ -84,6 +79,7 @@ export default {
     },
     comment() {
       this.$emit('on-comment');
+      alert(navigator.share);
     },
     cliclComentLabel() {
       const body = document.querySelector('body');
