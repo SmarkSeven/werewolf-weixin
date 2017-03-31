@@ -8,10 +8,10 @@
     <div v-if="cardItem.category === '4'" class="music-box">
       <div class="music-box-left">
         <div class="music-img-box">
-          <img class="music-img" v-lazy="cardItem.img_url"></img>
+          <img class="music-img" :class="{'music-img-rotate': isPlaying}" v-lazy="cardItem.img_url"></img>
         </div>
          <img class="music-xiami" src="../assets/xiami_logo.png" alt="">
-         <div :class="{'music-play-btn':!playing, 'music-pause-btn': playing}" @click="play"></div>
+         <div :class="{'music-play-btn': !isPlaying, 'music-pause-btn': isPlaying}" @click.stop="play"></div>
       </div>
       <div class="music-box-right"><img src="../assets/feeds_music_story.png" class="music-story" alt="music-story"></div>
     </div>
@@ -33,15 +33,10 @@
 </template>
 <script>
 import { mapState, mapMutations } from 'vuex';
+import { Toast } from 'mint-ui';
 import getDateDiff from '../js/date.js';
 
 export default{
-  data() {
-    return {
-      playing: false,
-      musicStoryBgUrl: '../assets/feeds_music_story.png',
-    };
-  },
   props: {
     cardItem: Object,
   },
@@ -49,6 +44,8 @@ export default{
     ...mapState({
       weather: state => state.one.weather,
       praiseContents: state => state.storage.praiseContents,
+      playId: state => state.music.playId,
+      playState: state => state.music.playState,
     }),
     tag() {
       const tag = this.cardItem.tag_list[0];
@@ -94,6 +91,7 @@ export default{
           return '';
       }
     },
+    // 是否经点赞
     isPraised() {
       const index = this.praiseContents.indexOf(Number(this.cardItem.content_id));
       if (index > -1) {
@@ -132,6 +130,10 @@ export default{
         storyId: Number(this.cardItem.movie_story_id),
       };
     },
+    // 当前音乐是否正在播放
+    isPlaying() {
+      return this.musicId === this.playId && this.playState === 'playing';
+    },
   },
   methods: {
     ...mapMutations([
@@ -143,10 +145,65 @@ export default{
       'updateWordsAuthor',
       'updateQuestionId',
       'updateReadingAuthorName',
-      'updateCurrentItemCategory']),
+      'updateCurrentItemCategory',
+      'updatePlayList',
+      'updatePlayIndex',
+      'updatePlayState',
+      'updatePlayId']),
     play() {
-      console.log('音乐 走！');
-      this.playing = !this.playing;
+      // 当前音乐正在播放
+      if (this.musicId === this.playId && this.playState === 'playing') {
+        this.updatePlayState({ playState: 'pause' });
+        return;
+      }
+      // 当前音乐处于暂停状态
+      if (this.musicId === this.playId && this.playState === 'pause') {
+        this.updatePlayState({ playState: 'playing' });
+        return;
+      }
+      // 当前音乐不处于就绪状态
+      const self = this;
+      if (this.cardItem.audio_platform === '1') {
+        const params = {
+          id: this.musicId,
+          r: 'song/detail',
+          t: +new Date(),
+          app_key: '09bef203bfa02bfbe3f1cfd7073cb0f3',
+          xiami_token: 'rv1pcXmARBnyZ3yZxt7XVPtG2Zo9rrfAE4BqOZw',
+          xsdk_ver: '1.0.7',
+          callback: 'songdetail14908852760791',
+        };
+        // audio资源来自于虾米
+        this.$http.get('/xiami/audio', { params })
+        .then((resp) => {
+          if (resp) {
+            const respData = resp.data.replace(/(songdetail14908852760791\()|\)/g, '');
+            console.log(respData);
+            const res = JSON.parse(respData);
+            const audio = {
+              musicName: self.cardItem.music_name,
+              musicId: self.musicId,
+              audioAuthor: self.cardItem.audio_author,
+              audioUrl: res.data.song.listen_file,
+            };
+            // 更新播放列表
+            self.updatePlayList({ playList: [audio] });
+            self.updatePlayIndex({ playIndex: 0 });
+            // 更新放地ID
+            self.updatePlayId({ playId: self.musicId });
+            // 更新播放状态
+            self.updatePlayState({ playState: 'playing' });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Toast({
+            message: '网络错误',
+            position: 'bottom',
+            duration: 1000,
+          });
+        });
+      }
     },
     clickImg() {
       if (this.cardItem === '0') {
@@ -359,7 +416,14 @@ html {
       overflow: hidden;
       .music-img {
         height: 100%;
-        width: auto;
+        width: 100%;
+        border-radius: 50%;
+        filter: brightness(.85);
+        animation: rotate 20s linear infinite;
+        animation-play-state: paused;
+      }
+      .music-img-rotate {
+        animation-play-state: running;
       }
     }
     .music-xiami {
@@ -374,7 +438,7 @@ html {
       position: absolute;
       height: rem(91);
       width: rem(91);
-      top: rem(317);
+      top: rem(312);
       right: rem(318);
       border-radius: 50%;
       background: rgba(255, 255, 255, .6);
@@ -420,6 +484,14 @@ html {
     background-image: url('../assets/movie-background.png');
     background-size: cover;
     box-shadow: 0 -2px 5px  #fff inset;
+  }
+}
+@keyframes rotate{
+  0%{
+    transform:rotate(0deg);
+  }
+  100%{
+    transform:rotate(360deg);
   }
 }
 </style>

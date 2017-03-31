@@ -33,7 +33,14 @@ module.exports = {
       '/comment/praise': 'http://v3.wufazhuce.com:8000/api',
       '/comment/unpraise': 'http://v3.wufazhuce.com:8000/api',
       '/collection/add': 'http://v3.wufazhuce.com:8000/api',
-      '/collection/del': 'http://v3.wufazhuce.com:8000/api'
+      '/collection/del': 'http://v3.wufazhuce.com:8000/api',
+      '/xiami/audio': {
+        target: 'http://api.xiami.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/xiami/audio': '/web'
+        }
+      }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

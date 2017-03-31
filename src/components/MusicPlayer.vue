@@ -1,43 +1,231 @@
 <template>
   <div id="music-player">
     <header>
-      <p class="music-title">南方姑娘</p>
-      <input class="range" id="range" type="range" ref="range" value="0" @input="onInput">
-      <p class="timer">03’03"</p>
-      <p class="singer">王菲</p>
+      <p class="music-title">{{musicName}}</p>
+      <input class="range" id="range" type="range" ref="range" :max="duration" :value="currentTime"  @input="onInput">
+      <p class="timer">{{restTime}}</p>
+      <p class="singer">{{audioAuthor}}</p>
       <div class="play-box">
-        <div class="last"></div>
-        <div :class="{'play': playing, 'pause': !playing}" @click="play"></div>
-        <div class="next"></div>
+        <div class="last" @click="last"></div>
+        <div :class="{'play': playState === 'playing', 'pause': playState === 'pause'}" @click="play"></div>
+        <div class="next" @click="next"></div>
       </div>
       <div class="btn-box">
-        <div class="cycle-mode"></div>
+        <div class="cycle-mode":class="{'single-cycle': !singleLoop}" @click="cycleMode"></div>
         <span class="source">来自虾米音乐</span>
         <div class="collect"></div>
         <div class="detail-content"></div>
       </div>
     </header>
-    <div class="mask"></div>
+    <div class="mask" @click="onMaskClick"></div>
   </div>
 </template>
 <script>
+import { mapState, mapMutations } from 'vuex';
+import { Toast } from 'mint-ui';
+
 export default{
   data() {
     return {
       min: 0,
-      max: 100,
       step: 0.1,
-      playing: false,
+      audio: new Audio(),
+      // DOM ELement 内部属性不能被跟踪 --- 不可枚举
+      duration: 0,
+      currentTime: 0,
+      singleLoop: true,
     };
   },
-  methods: {
-    onInput(e) {
-      const v = (e.target.value * 100) / this.max;
+  computed: {
+    ...mapState({
+      playList: state => state.music.playList,
+      playIndex: state => state.music.playIndex,
+      playState: state => state.music.playState,
+      playId: state => state.music.playId,
+    }),
+    // 资源路径
+    audioSrc() {
+      if (this.playIndex > -1 && this.playList.length > 0) {
+        return this.playList[this.playIndex].audioUrl;
+      }
+      return '';
+    },
+    // 歌曲名
+    musicName() {
+      if (this.playIndex > -1 && this.playList.length > 0) {
+        return this.playList[this.playIndex].musicName;
+      }
+      return ' ';
+    },
+    // 歌唱者
+    audioAuthor() {
+      if (this.playIndex > -1 && this.playList.length > 0) {
+        return this.playList[this.playIndex].audioAuthor;
+      }
+      return ' ';
+    },
+    // 剩余播放时间
+    restTime() {
+      const rest = this.duration - this.currentTime;
+      if (rest > 0) {
+        const munite = 60;
+        let mins = rest / munite;
+        let secs = Math.round(rest % munite);
+        if (secs < 10) {
+          secs = `0${secs}'`;
+        } else {
+          secs = `${secs}'`;
+        }
+        if (mins < 10) {
+          mins = `0${Math.floor(mins)}"`;
+        } else {
+          mins = `${Math.floor(mins)}"`;
+        }
+        return `${mins}${secs}`;
+      }
+      const s = '00"';
+      return `0'${s}`;
+    },
+  },
+  created() {
+    const audio = this.audio;
+    audio.autoplay = true;
+    audio.loop = this.singleLoop;
+    audio.addEventListener('durationchange', () => {
+      this.duration = audio.duration;
+    });
+    audio.addEventListener('timeupdate', () => {
+      this.currentTime = audio.currentTime;
+      const v = (audio.currentTime * 100) / this.duration;
       const range = this.$refs.range;
       range.style.backgroundSize = `100% 3px, ${v}% 3px`;
+    });
+    audio.addEventListener('playing', () => {
+      // this.playState({ playState: 'playing' });
+    });
+    audio.addEventListener('pause', () => {
+      // this.playState({ playState: 'pause' });
+    });
+    audio.addEventListener('loadstart', () => {
+      Toast({
+        message: '加载中...',
+        position: 'bottom',
+        duration: 800,
+      });
+    });
+    audio.addEventListener('ended', () => {
+      if (!audio.loop) {
+        this.next();
+      }
+    });
+  },
+  watch: {
+    audioSrc() {
+      // 更新播放器资源
+      this.audio.src = this.audioSrc;
     },
+    playIndex() {
+      // 更新播放ID
+      const playId = this.playList[this.playIndex].musicId;
+      this.updatePlayId({ playId });
+    },
+    playState() {
+      if (this.playState === 'playing') {
+        this.audio.play();
+        return;
+      }
+      this.audio.pause();
+    },
+  },
+  methods: {
+    ...mapMutations([
+      'updatePlayIndex',
+      'updatePlayList',
+      'updateShowMusicPlayer',
+      'updatePlayId',
+    ]),
+    // 滑动竿杆
+    onInput(e) {
+      const input = e.target.value;
+      const v = (input * 100) / this.max;
+      const range = this.$refs.range;
+      this.audio.currentTime = input;
+      range.style.backgroundSize = `100% 3px, ${v}% 3px`;
+    },
+    // 播放或者定停
     play() {
-      this.playing = !this.playing;
+      const audio = this.audio;
+      if (audio.readyState > 1) {
+        if (audio.paused === true) {
+          audio.play();
+          this.playState({ playState: 'playing' });
+        } else {
+          audio.pause();
+          this.playState({ playState: 'pause' });
+        }
+      }
+    },
+    // 单曲循环
+    loop() {
+      this.audio.loop = !this.audio.loop;
+      this.singleLoop = this.audio.loop;
+    },
+    // 播放上一首
+    last() {
+      const len = this.playList.length;
+      const payload = {};
+      if (len !== 0) {
+        if (len === 1) {
+          this.audio.currentTime = 0;
+          return;
+        }
+        if (this.playIndex > 0) {
+          payload.playIndex = this.playIndex - 1;
+        } else {
+          payload.playIndex = 0;
+        }
+        this.updatePlayIndex(payload);
+      }
+    },
+    // 播放下一首
+    next() {
+      const len = this.playList.length;
+      const payload = {};
+      if (len !== 0) {
+        if (len === 1) {
+          this.audio.currentTime = 0;
+          return;
+        }
+        if (this.playIndex < len - 1) {
+          payload.playIndex = this.playIndex + 1;
+        } else {
+          payload.playIndex = 0;
+        }
+        this.updatePlayIndex(payload);
+      }
+    },
+    // 切换播放模式
+    cycleMode() {
+      this.updatePlayList({ playList: [
+        {
+          musicId: '1',
+          musicName: '里不知道的时光',
+          musicAuthor: '李钰',
+          audioUrl: 'http://om5.alicdn.com/220/1220/311523/3450778_3103164_l.mp3?auth_key=90ce7e374e83a7d4995a41657fb786c8-1491447600-0-null',
+        },
+        {
+          musicId: '2',
+          musicName: '竺蓝兰金',
+          musicAuthor: '付土康',
+          audioUrl: 'http://hd.xiaotimi.com/2016/xc/12/BQK.mp4?#.mp3',
+        },
+      ] });
+      this.updatePlayIndex({ playIndex: 0 });
+      this.loop();
+    },
+    // 点击空白区域
+    onMaskClick() {
+      this.updateShowMusicPlayer({ showMusicPlayer: false });
     },
   },
 };
@@ -48,9 +236,11 @@ export default{
   position: fixed;
   height: 100%;
   width: 100%;
+  overflow: hidden;
   header {
     position: relative;
     padding: 0 rem(42);
+    background-color: white;
     .music-title {
       padding-top: rem(25);
       height: rem(125);
@@ -195,11 +385,13 @@ export default{
       }
       .cycle-mode {
         left: 0;
+        background-image: url('../assets/player_single_cycle.png');
+      }
+      .single-cycle {
         background-image: url('../assets/player_all_cycle.png');
       }
       .source {
-        padding: rem(3) 0;
-        padding-left: rem(60);
+        padding-left: rem(50);
         color: rgb(200,200,200);
         font-size: 11px;
         background: url('../assets/xiami_logo.png') no-repeat;

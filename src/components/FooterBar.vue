@@ -1,5 +1,5 @@
 <template>
-<div class="page-footer">
+<div id="page-footer">
   <div class="page-footer-left" v-if="data">
     <div class="page-footer-collect" @click="onCollectClick" :class="{'page-footer-collected': isCollected}"></div>
     <div class="page-footer-like" :class="{'page-footer-liked': isPraised}" @click="like"></div>
@@ -93,7 +93,7 @@ export default {
 </script>
 <style lang="scss">
 @import '../styles/rem.scss';
-.page-footer {
+#page-footer{
   position: fixed;
   padding-top: rem(5);
   height: rem(135);

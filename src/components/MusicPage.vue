@@ -1,7 +1,7 @@
 <template>
   <div id="music-page">
     <header-bar :leftOptions="leftOptions" title="一个音乐"></header-bar>
-    <music-header :cover="cover"></music-header>
+    <music-header :data="headerData" @on-click-play="play"></music-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
     <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
     <related-label v-if="related.length > 0"></related-label>
@@ -12,7 +12,8 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
+import { Toast } from 'mint-ui';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
 import Comment from './Comment';
@@ -58,6 +59,10 @@ export default{
       basicQueryString: state => state.one.basicQueryString,
       musicId: state => state.music.musicId,
       author: state => state.music.author,
+      playId: state => state.music.playId,
+      playState: state => state.music.playState,
+      audioAuthor: state => state.music.audioAuthor,
+      musicName: state => state.music.musicName,
     }),
     title() {
       return this.music && this.music.title;
@@ -79,6 +84,16 @@ export default{
     },
     hpAuthorIntroduce() {
       return this.essay && `${this.msuic.hp_author_introduce}${this.music.editor_email}`;
+    },
+    // 当前音乐是否正在播放
+    isPlaying() {
+      return String(this.musicId) === this.playId && this.playState === 'playing';
+    },
+    headerData() {
+      return this.music && {
+        cover: this.music.cover,
+        playing: this.isPlaying,
+      };
     },
     footerData() {
       return this.music && this.update && {
@@ -103,6 +118,11 @@ export default{
     next();
   },
   methods: {
+    ...mapMutations([
+      'updatePlayState',
+      'updatePlayList',
+      'updatePlayIndex',
+      'updatePlayId']),
     getData(contentId, musicId) {
       this.getMusicData(musicId);
       this.getAuthorList(contentId);
@@ -164,6 +184,60 @@ export default{
         }
       } catch (err) {
         console.log(err);
+      }
+    },
+    play() {
+      // 正在播放当前音乐则暂停
+      if (this.music.music_id === this.playId && this.playState === 'playing') {
+        this.updatePlayState({ playState: 'pause' });
+        return;
+      }
+      // 当前音乐处于暂停状态则播放
+      if (this.music.music_id === this.playId && this.playState === 'pause') {
+        this.updatePlayState({ playState: 'playing' });
+        return;
+      }
+      // 添加当前音乐到播放列表
+      const self = this;
+      if (this.music.audio_platform !== '2') {
+        const params = {
+          id: this.musicId,
+          r: 'song/detail',
+          t: +new Date(),
+          app_key: '09bef203bfa02bfbe3f1cfd7073cb0f3',
+          xiami_token: 'rv1pcXmARBnyZ3yZxt7XVPtG2Zo9rrfAE4BqOZw',
+          xsdk_ver: '1.0.7',
+          callback: 'songdetail14908852760791',
+        };
+        // audio资源来自于虾米
+        this.$http.get('/xiami/audio', { params })
+        .then((resp) => {
+          if (resp) {
+            const respData = resp.data.replace(/(songdetail14908852760791\()|\)/g, '');
+            const res = JSON.parse(respData);
+            const audio = {
+              musicName: self.musicName,
+              musicId: String(self.musicId),
+              audioAuthor: self.music.audioAuthor,
+              audioUrl: res.data.song.listen_file,
+            };
+            // 更新播放列表
+            self.updatePlayList({ playList: [audio] });
+            self.updatePlayIndex({ playIndex: 0 });
+            // 更新放地ID
+            self.updatePlayId({ playId: String(self.musicId) });
+            // 更新播放状态
+            self.updatePlayState({ playState: 'playing' });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Toast({
+            message: '网络错误',
+            position: 'bottom',
+            duration: 1000,
+          });
+        });
       }
     },
     toAuthor() {

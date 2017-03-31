@@ -1,12 +1,24 @@
 <template>
   <div id="app">
+    <music-player class="player" v-show="showMusicPlayer"></music-player>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import MusicPlayer from './components/MusicPlayer';
+
 export default {
   name: 'app',
+  components: {
+    MusicPlayer,
+  },
+  computed: {
+    ...mapState({
+      showMusicPlayer: state => state.one.showMusicPlayer,
+    }),
+  },
 };
 </script>
 
@@ -17,6 +29,11 @@ body {
 }
 #app {
   height: 100%;
+  .player {
+    height: 100%;
+    width: 100%;
+    z-index: 9999;
+  }
 }
 * {
   box-sizing: border-box;

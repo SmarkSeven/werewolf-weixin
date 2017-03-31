@@ -8,6 +8,7 @@ if (!process.env.NODE_ENV) {
 var opn = require('opn')
 var path = require('path')
 var express = require('express')
+var cheerio = require('cheerio');
 var webpack = require('webpack')
 var bodyParser = require('body-parser')
 var proxyMiddleware = require('http-proxy-middleware')

@@ -1,9 +1,9 @@
 <template>
   <div class="music-header">
     <div class="music-header-box" @click="showDetail">
-      <img class="music-header-img" :src="cover"  alt="allbum-imgs">
+      <img class="music-header-img" :class="{'rotate': data.playing}" :src="data.cover" alt="allbum-imgs">
       <img class="muisc-header-xiami" src="../assets/xiami_logo.png" alt="xiami-logo">
-      <div :class="{'music-header-play-btn': !playing ,'music-header-pause-btn': playing}" @click.stop="play"></div>
+      <div :class="{'music-header-play-btn': !playing ,'music-header-pause-btn': data.playing}" @click.stop="play"></div>
     </div>
     <p class="music-header-subtitle">· {{musicName}} ·</p>
     <p class="music-header-audioAlbum">{{audioAuthor}} | {{audioAlbum}}</p>
@@ -16,11 +16,8 @@ import { mapState } from 'vuex';
 
 export default {
   name: 'music-header',
-  props: ['cover'],
-  data() {
-    return {
-      playing: false,
-    };
+  props: {
+    data: Object,
   },
   computed: {
     ...mapState({
@@ -36,14 +33,17 @@ export default {
       this.$emit('on-item-click');
     },
     play() {
-      this.playing = !this.playing;
-      console.log('music page play');
+      this.$emit('on-click-play');
     },
   },
 };
 </script>
 <style lang="scss">
 @import '../styles/rem.scss';
+@import '../styles/animation.css';
+img[src=""] {
+      opacity: 0;
+}
 .music-header {
   position: relative;
   padding-top: rem(1080);
@@ -62,6 +62,12 @@ export default {
         height: rem(1216);
         width: rem(1216);
         border-radius: 50%;
+        filter: brightness(.9);
+        animation: rotate 30s linear infinite;
+        animation-play-state: paused;
+    }
+    .rotate {
+      animation-play-state: running;
     }
     .muisc-header-xiami {
       position: absolute;
@@ -76,9 +82,9 @@ export default {
       height: rem(192);
       width: rem(192);
       top: rem(565);
-      right: rem(565);
+      right: rem(560);
       border-radius: 50%;
-      background: rgba(250, 250, 250, .62);
+      background: rgba(250, 250, 250, .5);
       &:after {
         content: '';
         display: block;
@@ -88,7 +94,7 @@ export default {
     .music-header-play-btn {
       &:after {
         top: rem(50);
-        left: rem(58);
+        left: rem(65);
         border-top: rem(46) solid transparent;
         border-right: rem(78) solid transparent;
         border-bottom: rem(46) solid transparent;
@@ -100,7 +106,7 @@ export default {
         height: rem(92);
         width: rem(18);
         top: rem(50);
-        left: rem(54);
+        left: rem(60);
         border-right: rem(30) solid white;
         border-left: rem(30) solid white;
       }
@@ -128,4 +134,5 @@ export default {
       color: black;
     }
 }
+
 </style>

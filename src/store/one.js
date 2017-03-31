@@ -11,10 +11,11 @@ const one = {
     currentItemCategory: 0,
     currentIndex: -1,
     oneIdList: [],
-    oneList: [],
-    readingList: [],
-    musicList: [],
-    movieList: [],
+    oneList: [],  // 首页数据
+    readingList: [],  // 阅读列表
+    musicList: [],  // 音乐列表
+    movieList: [],  // 电影列表
+    showMusicPlayer: true,  // 是否显示音乐播放控件
   },
   mutations: {
     updateLastReadingId(state, payload) {
@@ -47,18 +48,25 @@ const one = {
     pushMusicList(state, payload) {
       state.musicList.push(...payload.musicList);
     },
+    // 向电影列表添加数据
     pushMovieList(state, payload) {
       state.movieList.push(...payload.movieList);
     },
+    // 更新当前显示内容的分类
     updateCurrentItemCategory(state, payload) {
       state.currentItemCategory = payload.currentItemCategory;
     },
+    // 更新点赞数量
     updatePraisenum(state, payload) {
       state[payload.dataSet].forEach((item) => {
         if (Number(item.content_id) === payload.contentId) {
           item.like_count += payload.num;
         }
       });
+    },
+    // 更新音乐播放控件显示状态
+    updateShowMusicPlayer(state, payload) {
+      state.showMusicPlayer = payload.showMusicPlayer;
     },
   },
   actions: {},
