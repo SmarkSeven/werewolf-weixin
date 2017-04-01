@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 // import { Toast } from 'mint-ui';
 import getDateDiff from '../js/date.js';
 
@@ -151,6 +151,7 @@ export default{
       'updatePlayState',
       'updatePlayId',
       'updateShowMusicPlayer']),
+    ...mapActions(['fetchAudioFromXiami']),
     play() {
       // 当前音乐正在播放
       if (this.musicId === this.playId && this.playState === 'playing') {
@@ -163,7 +164,7 @@ export default{
         return;
       }
       // 当前音乐不处于就绪状态
-      // const self = this;
+      const self = this;
       if (this.cardItem.audio_platform === '1') {
         const playload = {
           musicName: self.cardItem.music_name,
@@ -172,45 +173,6 @@ export default{
         };
         this.fetchAudioFromXiami(playload);
       }
-      //   const params = {
-      //     id: this.musicId,
-      //     r: 'song/detail',
-      //     t: +new Date(),
-      //     app_key: '09bef203bfa02bfbe3f1cfd7073cb0f3',
-      //     xiami_token: 'rv1pcXmARBnyZ3yZxt7XVPtG2Zo9rrfAE4BqOZw',
-      //     xsdk_ver: '1.0.7',
-      //     callback: 'songdetail14908852760791',
-      //   };
-      //   // audio资源来自于虾米
-      //   this.$http.get('/xiami/audio', { params })
-      //   .then((resp) => {
-      //     if (resp) {
-      //       const respData = resp.data.replace(/(songdetail14908852760791\()|\)/g, '');
-      //       const res = JSON.parse(respData);
-      //       const audio = {
-      //         musicName: self.cardItem.music_name,
-      //         musicId: self.musicId,
-      //         musicAuthor: self.cardItem.audio_author,
-      //         audioUrl: res.data.song.listen_file,
-      //       };
-      //       // 更新播放列表
-      //       self.updatePlayList({ playList: [audio] });
-      //       self.updatePlayIndex({ playIndex: 0 });
-      //       // 更新放地ID
-      //       self.updatePlayId({ playId: self.musicId });
-      //       // 更新播放状态
-      //       self.updatePlayState({ playState: 'playing' });
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //     Toast({
-      //       message: '网络错误',
-      //       position: 'bottom',
-      //       duration: 1000,
-      //     });
-      //   });
-      // }
     },
     clickImg() {
       if (this.cardItem === '0') {

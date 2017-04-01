@@ -88,63 +88,48 @@ var sidPattern = /(\d+)/;
 var songUrlPattern = /a href="(\/song\/\d+)"/g;
 
 app.get('/xiami/song',urlencodedParser, function(req, res) {
-    console.log(req.query.id)
-    const songId = req.query.id;
-    var options = url.parse('http://www.xiami.com/song/playlist/id/'+ songId +'/object_name/default/object_id/0');
-    var xiamiRealSong = {};
-    http.get(options, function(resp) {
-        resp.setEncoding('utf8');
-        var xml = '';
-        resp.on('data', function(data) {
-            xml += data;
-        })
-        resp.on('end', function() {
-            xmlreader.read(xml, function(errors, responsive){
-                if(null !== errors ){
-                    res.json({
-                        'res': 1,
-                        'message': '服务内部错误。'+errors,
-                    });
-                    return;
-                }
-                if (!responsive.playlist) {
-                    res.json({
-                        'res': 1,
-                        'message': '没找到相关信息，该歌曲很可能已经从虾米下架。'
-                    });
-                    return;
-                }
-                xiamiRealSong.title = toTxt(responsive.playlist.trackList.track.title.text());
-                xiamiRealSong.artist = parseArtist(responsive.playlist.trackList.track);
-                xiamiRealSong.album = toTxt(responsive.playlist.trackList.track.album_name.text());
-                xiamiRealSong.url = getMp3Location(responsive.playlist.trackList.track.location.text());
-
-                if (typeof responsive.playlist.trackList.track.lyric_url.text !== 'undefined') {
-                    xiamiRealSong.lyricUrl = toTxt(responsive.playlist.trackList.track.lyric_url.text());
-                } else {
-                    xiamiRealSong.lyricUrl = null;
-                }
-                // 封面处理
-                var cover;
-                var coverpath = responsive.playlist.trackList.track.pic.text();
-                var coverReg = /http:\/\/[a-zA-Z0-9-.-\/-_]+.(jpg|jpeg|png|gif|bmp)/g;
-                var json;
-                // 正则替换小的封面为大封面
-                if(coverReg.test(coverpath)){
-                    coverpath.replace(coverReg, function(s,value) {
-                        cover = s.replace('_1', '');
-                    });
-                }
-                xiamiRealSong.cover =  cover;
-                json = xiamiRealSong;
-                res.json({
-                  res: 0,
-                  data: json,
-                });
-            })
-        });
+  const songId = req.query.id;
+  var options = url.parse('http://www.xiami.com/song/playlist/id/'+ songId +'/object_name/default/object_id/0');
+  var xiamiRealSong = {};
+  http.get(options, function(resp) {
+    resp.setEncoding('utf8');
+    var xml = '';
+    resp.on('data', function(data) {
+      xml += data;
     });
+    resp.on('end', function() {
+      xmlreader.read(xml, function(errors, responsive){
+        if(null !== errors ){
+          res.json({
+            'res': 1,
+            'message': '服务内部错误。'+errors,
+           });
+           return;
+          }
+        if (!responsive.playlist) {
+          res.json({
+            'res': 1,
+            'message': '没找到相关信息，该歌曲很可能已经从虾米下架。'
+          });
+          return;
+         }
+         xiamiRealSong.title = toTxt(responsive.playlist.trackList.track.title.text());
+         xiamiRealSong.artist = parseArtist(responsive.playlist.trackList.track);
+         xiamiRealSong.album = toTxt(responsive.playlist.trackList.track.album_name.text());
+         xiamiRealSong.url = getMp3Location(responsive.playlist.trackList.track.location.text());
 
+         if (typeof responsive.playlist.trackList.track.lyric_url.text !== 'undefined') {
+           xiamiRealSong.lyricUrl = toTxt(responsive.playlist.trackList.track.lyric_url.text());
+         } else {
+            xiamiRealSong.lyricUrl = null;
+         }
+         res.json({
+           res: 0,
+           data: xiamiRealSong,
+          });
+         })
+       });
+    });
 });
 
 

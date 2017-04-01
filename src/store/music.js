@@ -1,5 +1,4 @@
 // import axios from 'axios';
-// import { Toast } from 'mint-ui';
 
 const music = {
   state: {
@@ -69,26 +68,6 @@ const music = {
       xhr.open('GET', `/xiami/song?id=${payload.musicId}`, false);
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.send(null);
-      // audio资源来自于虾米
-      // const params = {
-        // id: payload.musicId,
-      // };
-      // axios.get('/xiami/song', { params })
-      // .then((resp) => {
-      //   if (resp) {
-      //     const audio = {
-      //       musicName: payload.musicName,
-      //       musicId: payload.musicId,
-      //       musicAuthor: payload.audioAuthor,
-      //       audioUrl: resp.data.data.url,
-      //     };
-      //     commit('updatePlayList', { playList: [audio] });
-      //     commit('updatePlayIndex', { playIndex: 0 });
-      //   }
-      // })
-      // .catch((error) => {
-      //   console.log(error);
-      // });
     },
   },
 };

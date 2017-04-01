@@ -138,12 +138,9 @@ export default{
     audioSrc() {
       // 更新播放器资源
       audio.src = this.audioSrc;
+      const playId = this.playList[this.playIndex].musicId;
+      this.updatePlayId({ playId });
       audio.load();
-      Toast({
-        message: '更新播放器资源',
-        position: 'top',
-        duration: 1000,
-      });
     },
     playIndex() {
       // 更新播放ID
