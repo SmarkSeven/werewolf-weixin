@@ -1,9 +1,9 @@
 <template>
   <div class="music-header">
     <div class="music-header-box" @click="showDetail">
-      <img class="music-header-img" :class="{'rotate': data.playing}" :src="data.cover" alt="allbum-imgs">
+      <img class="music-header-img" :class="{'rotate': isPlaying}" :src="data && data.cover" alt="allbum-imgs" @click="show">
       <img class="muisc-header-xiami" src="../assets/xiami_logo.png" alt="xiami-logo">
-      <div :class="{'music-header-play-btn': !playing ,'music-header-pause-btn': data.playing}" @click.stop="play"></div>
+      <div :class="{'music-header-play-btn': !isPlaying ,'music-header-pause-btn': isPlaying}" @click.stop="play"></div>
     </div>
     <p class="music-header-subtitle">· {{musicName}} ·</p>
     <p class="music-header-audioAlbum">{{audioAuthor}} | {{audioAlbum}}</p>
@@ -12,7 +12,7 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'music-header',
@@ -27,13 +27,20 @@ export default {
       audioAuthor: state => state.music.audioAuthor,
       audioAlbum: state => state.music.audioAlbum,
     }),
+    isPlaying() {
+      return this.data && this.data.playing;
+    },
   },
   methods: {
+    ...mapMutations(['updateShowMusicPlayer']),
     showDetail() {
       this.$emit('on-item-click');
     },
     play() {
       this.$emit('on-click-play');
+    },
+    show() {
+      this.updateShowMusicPlayer({ show: true });
     },
   },
 };

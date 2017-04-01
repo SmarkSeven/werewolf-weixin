@@ -1,3 +1,6 @@
+// import axios from 'axios';
+// import { Toast } from 'mint-ui';
+
 const music = {
   state: {
     musicId: 0,
@@ -41,6 +44,51 @@ const music = {
     },
     updatePlayId(state, payload) {
       state.playId = payload.playId;
+    },
+  },
+  actions: {
+    fetchAudioFromXiami({ commit }, payload) {
+      /** 在Promise中直接或间接调用Play()都会被手机端Chrome拦截 */
+      const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          const audio = {
+            musicName: payload.musicName,
+            musicId: payload.musicId,
+            musicAuthor: payload.audioAuthor,
+            audioUrl: res.data.url,
+          };
+          commit('updatePlayList', { playList: [audio] });
+          commit('updatePlayIndex', { playIndex: 0 });
+        }
+      };
+      // 必须使用同步请求false
+      // 否则在手机端Chrome中得到一下错误
+      // Uncaught (in promise) DOMException: play() can only be initiated by a user gesture.
+      xhr.open('GET', `/xiami/song?id=${payload.musicId}`, false);
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.send(null);
+      // audio资源来自于虾米
+      // const params = {
+        // id: payload.musicId,
+      // };
+      // axios.get('/xiami/song', { params })
+      // .then((resp) => {
+      //   if (resp) {
+      //     const audio = {
+      //       musicName: payload.musicName,
+      //       musicId: payload.musicId,
+      //       musicAuthor: payload.audioAuthor,
+      //       audioUrl: resp.data.data.url,
+      //     };
+      //     commit('updatePlayList', { playList: [audio] });
+      //     commit('updatePlayIndex', { playIndex: 0 });
+      //   }
+      // })
+      // .catch((error) => {
+      //   console.log(error);
+      // });
     },
   },
 };

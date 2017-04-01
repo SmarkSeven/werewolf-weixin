@@ -15,7 +15,7 @@ const one = {
     readingList: [],  // 阅读列表
     musicList: [],  // 音乐列表
     movieList: [],  // 电影列表
-    showMusicPlayer: true,  // 是否显示音乐播放控件
+    showMusicPlayer: false,  // 是否显示音乐播放控件
   },
   mutations: {
     updateLastReadingId(state, payload) {
@@ -66,7 +66,7 @@ const one = {
     },
     // 更新音乐播放控件显示状态
     updateShowMusicPlayer(state, payload) {
-      state.showMusicPlayer = payload.showMusicPlayer;
+      state.showMusicPlayer = payload.show;
     },
   },
   actions: {},

@@ -24,12 +24,13 @@
 import { mapState, mapMutations } from 'vuex';
 import { Toast } from 'mint-ui';
 
+const audio = new Audio();
+
 export default{
   data() {
     return {
       min: 0,
       step: 0.1,
-      audio: new Audio(),
       // DOM ELement 内部属性不能被跟踪 --- 不可枚举
       duration: 0,
       currentTime: 0,
@@ -88,9 +89,19 @@ export default{
     },
   },
   created() {
-    const audio = this.audio;
+    window.audio = audio;
+    // const audio = this.audio;
     audio.autoplay = true;
     audio.loop = this.singleLoop;
+    audio.addEventListener('canplay', () => {
+      audio.play();
+    });
+    audio.addEventListener('load', () => {
+      audio.play();
+    });
+    audio.addEventListener('canplaythrough', () => {
+      audio.play();
+    });
     audio.addEventListener('durationchange', () => {
       this.duration = audio.duration;
     });
@@ -100,11 +111,15 @@ export default{
       const range = this.$refs.range;
       range.style.backgroundSize = `100% 3px, ${v}% 3px`;
     });
-    audio.addEventListener('playing', () => {
-      // this.playState({ playState: 'playing' });
+    audio.addEventListener('play', () => {
+      if (this.playState !== 'playing') {
+        this.updatePlayState({ playState: 'playing' });
+      }
     });
     audio.addEventListener('pause', () => {
-      // this.playState({ playState: 'pause' });
+      if (this.playState !== 'pause') {
+        this.updatePlayState({ playState: 'pause' });
+      }
     });
     audio.addEventListener('loadstart', () => {
       Toast({
@@ -122,7 +137,13 @@ export default{
   watch: {
     audioSrc() {
       // 更新播放器资源
-      this.audio.src = this.audioSrc;
+      audio.src = this.audioSrc;
+      audio.load();
+      Toast({
+        message: '更新播放器资源',
+        position: 'top',
+        duration: 1000,
+      });
     },
     playIndex() {
       // 更新播放ID
@@ -131,10 +152,11 @@ export default{
     },
     playState() {
       if (this.playState === 'playing') {
-        this.audio.play();
-        return;
+        audio.play();
       }
-      this.audio.pause();
+      if (this.playState === 'pause') {
+        audio.pause();
+      }
     },
   },
   methods: {
@@ -143,32 +165,32 @@ export default{
       'updatePlayList',
       'updateShowMusicPlayer',
       'updatePlayId',
+      'updatePlayState',
     ]),
     // 滑动竿杆
     onInput(e) {
       const input = e.target.value;
       const v = (input * 100) / this.max;
       const range = this.$refs.range;
-      this.audio.currentTime = input;
+      audio.currentTime = input;
       range.style.backgroundSize = `100% 3px, ${v}% 3px`;
     },
     // 播放或者定停
     play() {
-      const audio = this.audio;
       if (audio.readyState > 1) {
         if (audio.paused === true) {
-          audio.play();
-          this.playState({ playState: 'playing' });
+          // audio.play();
+          this.updatePlayState({ playState: 'playing' });
         } else {
-          audio.pause();
-          this.playState({ playState: 'pause' });
+          // audio.pause();
+          this.updatePlayState({ playState: 'pause' });
         }
       }
     },
     // 单曲循环
     loop() {
-      this.audio.loop = !this.audio.loop;
-      this.singleLoop = this.audio.loop;
+      audio.loop = !audio.loop;
+      this.singleLoop = audio.loop;
     },
     // 播放上一首
     last() {
@@ -176,7 +198,7 @@ export default{
       const payload = {};
       if (len !== 0) {
         if (len === 1) {
-          this.audio.currentTime = 0;
+          audio.currentTime = 0;
           return;
         }
         if (this.playIndex > 0) {
@@ -193,7 +215,7 @@ export default{
       const payload = {};
       if (len !== 0) {
         if (len === 1) {
-          this.audio.currentTime = 0;
+          audio.currentTime = 0;
           return;
         }
         if (this.playIndex < len - 1) {
@@ -213,15 +235,9 @@ export default{
           musicAuthor: '李钰',
           audioUrl: 'http://om5.alicdn.com/220/1220/311523/3450778_3103164_l.mp3?auth_key=90ce7e374e83a7d4995a41657fb786c8-1491447600-0-null',
         },
-        {
-          musicId: '2',
-          musicName: '竺蓝兰金',
-          musicAuthor: '付土康',
-          audioUrl: 'http://hd.xiaotimi.com/2016/xc/12/BQK.mp4?#.mp3',
-        },
       ] });
       this.updatePlayIndex({ playIndex: 0 });
-      this.loop();
+      // this.loop();
     },
     // 点击空白区域
     onMaskClick() {

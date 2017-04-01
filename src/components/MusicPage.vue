@@ -12,8 +12,8 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex';
-import { Toast } from 'mint-ui';
+import { mapState, mapMutations, mapActions } from 'vuex';
+// import { Toast } from 'mint-ui';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
 import Comment from './Comment';
@@ -123,6 +123,7 @@ export default{
       'updatePlayList',
       'updatePlayIndex',
       'updatePlayId']),
+    ...mapActions(['fetchAudioFromXiami']),
     getData(contentId, musicId) {
       this.getMusicData(musicId);
       this.getAuthorList(contentId);
@@ -189,56 +190,22 @@ export default{
     play() {
       // 正在播放当前音乐则暂停
       if (this.music.music_id === this.playId && this.playState === 'playing') {
+        console.log('正在暂停');
         this.updatePlayState({ playState: 'pause' });
         return;
       }
       // 当前音乐处于暂停状态则播放
       if (this.music.music_id === this.playId && this.playState === 'pause') {
+        console.log('即将播放');
         this.updatePlayState({ playState: 'playing' });
         return;
       }
-      // 添加当前音乐到播放列表
-      const self = this;
-      if (this.music.audio_platform !== '2') {
-        const params = {
-          id: this.musicId,
-          r: 'song/detail',
-          t: +new Date(),
-          app_key: '09bef203bfa02bfbe3f1cfd7073cb0f3',
-          xiami_token: 'rv1pcXmARBnyZ3yZxt7XVPtG2Zo9rrfAE4BqOZw',
-          xsdk_ver: '1.0.7',
-          callback: 'songdetail14908852760791',
-        };
-        // audio资源来自于虾米
-        this.$http.get('/xiami/audio', { params })
-        .then((resp) => {
-          if (resp) {
-            const respData = resp.data.replace(/(songdetail14908852760791\()|\)/g, '');
-            const res = JSON.parse(respData);
-            const audio = {
-              musicName: self.musicName,
-              musicId: String(self.musicId),
-              audioAuthor: self.music.audioAuthor,
-              audioUrl: res.data.song.listen_file,
-            };
-            // 更新播放列表
-            self.updatePlayList({ playList: [audio] });
-            self.updatePlayIndex({ playIndex: 0 });
-            // 更新放地ID
-            self.updatePlayId({ playId: String(self.musicId) });
-            // 更新播放状态
-            self.updatePlayState({ playState: 'playing' });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Toast({
-            message: '网络错误',
-            position: 'bottom',
-            duration: 1000,
-          });
-        });
-      }
+      const playload = {
+        musicId: String(this.musicId),
+        musicAuthor: this.music.audioAuthor,
+        musicName: this.musicName,
+      };
+      this.fetchAudioFromXiami(playload);
     },
     toAuthor() {
     },
