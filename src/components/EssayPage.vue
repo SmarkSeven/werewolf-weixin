@@ -116,21 +116,28 @@ export default{
   methods: {
     getData(contentId) {
       this.getEssayData(contentId);
-      this.getCommentData(contentId);
+      this.getCommentData(contentId, 0);
       this.getRelated(contentId);
       this.getUpdate(contentId);
     },
     loadMore() {
       this.loading = true;
-      setTimeout(() => {
-        console.log('more');
+      const commentLen = this.comments.length;
+      const lastComment = this.comments[commentLen - 1];
+      const contentId = this.$route.params.id;
+      if (lastComment) {
+        this.getCommentData(contentId, lastComment.id);
+      } else {
         this.loading = false;
-      }, 2500);
+      }
     },
     async getEssayData(contentId) {
       try {
         const resp = await this.$http.get(`${this.host}/essay/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
+        if (contentId) {
+          this.loading = false;
+        }
         if (result.res === 0 && result.data) {
           this.essay = result.data;
         }
@@ -138,12 +145,14 @@ export default{
         console.log(err);
       }
     },
-    async getCommentData(contentId) {
+    async getCommentData(contentId, commentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/essay/${contentId}/0?${this.basicQueryString}`);
+        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/essay/${contentId}/${commentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
-          this.comments = result.data.data;
+          // this.comments = result.data.data;
+          console.log(result.data);
+          this.comments.push(...result.data.data);
         }
       } catch (err) {
         console.log(err);
