@@ -55,7 +55,7 @@ const music = {
           const audio = {
             musicName: payload.musicName,
             musicId: payload.musicId,
-            musicAuthor: payload.audioAuthor,
+            musicAuthor: payload.musicAuthor,
             audioUrl: res.data.url,
           };
           commit('updatePlayList', { playList: [audio] });

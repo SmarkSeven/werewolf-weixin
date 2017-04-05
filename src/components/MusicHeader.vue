@@ -1,7 +1,7 @@
 <template>
-  <div class="music-header">
+  <div class="music-header" id='musicheader'>
     <div class="music-header-box" @click="showDetail">
-      <img class="music-header-img" :class="{'rotate': isPlaying}" :src="data && data.cover" alt="allbum-imgs" @click="show">
+      <img class="music-header-img" :class="{'rotate': isPlaying}"  src='data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='  alt="allbum-imgs" @click="show" ref="img">
       <img class="muisc-header-xiami" src="../assets/xiami_logo.png" alt="xiami-logo">
       <div :class="{'music-header-play-btn': !isPlaying ,'music-header-pause-btn': isPlaying}" @click.stop="play"></div>
     </div>
@@ -27,8 +27,16 @@ export default {
       audioAuthor: state => state.music.audioAuthor,
       audioAlbum: state => state.music.audioAlbum,
     }),
+    cover() {
+      return this.data && this.data.cover;
+    },
     isPlaying() {
       return this.data && this.data.playing;
+    },
+  },
+  watch: {
+    data() {
+      this.$refs.img.src = this.data.cover;
     },
   },
   methods: {
@@ -66,12 +74,12 @@ img[src=""] {
     border-bottom-right-radius: 50%;
     box-shadow: rem(8) rem(6) rem(15) rgb(246, 246, 246);
     .music-header-img {
-        height: rem(1216);
-        width: rem(1216);
-        border-radius: 50%;
-        filter: brightness(.9);
-        animation: rotate 30s linear infinite;
-        animation-play-state: paused;
+      height: rem(1216);
+      width: rem(1216);
+      border-radius: 50%;
+      filter: brightness(.9);
+      animation: rotate 30s linear infinite;
+      animation-play-state: paused;
     }
     .rotate {
       animation-play-state: running;

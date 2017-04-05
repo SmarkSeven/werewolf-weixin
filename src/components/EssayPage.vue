@@ -1,5 +1,5 @@
 <template>
-  <div id='essay-page'>
+  <div id='essay-page' v-show="show">
     <header-bar :leftOptions="leftOptions" title="一个阅读"></header-bar>
     <essay-header :title="title" :authorName="author"></essay-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
@@ -7,7 +7,13 @@
     <related-label v-if="related.length > 0"></related-label>
     <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
     <comment-label></comment-label>
-    <comment v-for="(comment,index) in comments" :comment="comment" :key="comment.id"></comment>
+    <ul v-infinite-scroll="loadMore"
+      infinite-scroll-disabled="loading"
+      infinite-scroll-distance="10">
+      <li>
+        <comment v-for="(comment,index) in comments" :comment="comment" :key="comment.id"></comment>
+      </li>
+    </ul>
     <footer-bar :data="footerData"></footer-bar>
   </div>
 </template>
@@ -40,6 +46,7 @@ export default{
       essay: null,
       comments: [],
       related: [],
+      show: false,
       leftOptions: {
         showBack: true,
       },
@@ -87,6 +94,12 @@ export default{
       };
     },
   },
+  created() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
+  },
   beforeRouteEnter(to, from, next) {
     // 文章内容ID
     const contentId = to.params.id;
@@ -106,6 +119,13 @@ export default{
       this.getCommentData(contentId);
       this.getRelated(contentId);
       this.getUpdate(contentId);
+    },
+    loadMore() {
+      this.loading = true;
+      setTimeout(() => {
+        console.log('more');
+        this.loading = false;
+      }, 2500);
     },
     async getEssayData(contentId) {
       try {

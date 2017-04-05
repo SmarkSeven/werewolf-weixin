@@ -16,6 +16,7 @@ const one = {
     musicList: [],  // 音乐列表
     movieList: [],  // 电影列表
     showMusicPlayer: false,  // 是否显示音乐播放控件
+    savedPosition: {},
   },
   mutations: {
     updateLastReadingId(state, payload) {
@@ -67,6 +68,10 @@ const one = {
     // 更新音乐播放控件显示状态
     updateShowMusicPlayer(state, payload) {
       state.showMusicPlayer = payload.show;
+    },
+    // 记录视图滚动位子
+    updateSavedPosition(state, payload) {
+      state.savedPosition[payload.path] = payload.position;
     },
   },
   actions: {},

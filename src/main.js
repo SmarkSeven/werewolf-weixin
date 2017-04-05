@@ -6,7 +6,7 @@ import FastClick from 'fastclick';
 import VueRouter from 'vue-router';
 import axios from 'axios';
 import { LoadingPlugin } from 'vux';
-import { Lazyload } from 'mint-ui';
+import { Lazyload, InfiniteScroll } from 'mint-ui';
 import { sync } from 'vuex-router-sync';
 import question from './store/question';
 import storage from './store/storage';
@@ -20,6 +20,7 @@ import routes from './route/routes';
 
 Vue.use(Vuex);
 Vue.use(Lazyload);
+Vue.use(InfiniteScroll);
 Vue.use(VueRouter);
 Vue.prototype.$http = axios;
 Vue.use(LoadingPlugin);

@@ -1,5 +1,5 @@
 <template>
-  <div id='movie-page'>
+  <div id='movie-page' :class="{'show': show, 'hidden': !show}">
     <header-bar :leftOptions="leftOptions" title="一个影视"></header-bar>
     <movie-header :title="title" :authorName="authorName" :photos="photos"></movie-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
@@ -42,6 +42,7 @@ export default{
       movieDetail: null,
       comments: [],
       related: [],
+      show: false,
       update: {
         praisenum: 0,
         sharenum: 0,
@@ -104,6 +105,12 @@ export default{
         commentnum: this.update.commentnum,
       };
     },
+  },
+  created() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
   },
   beforeRouteEnter(to, from, next) {
     // 文章内容ID
@@ -196,7 +203,14 @@ export default{
 </script>
 <style lang="scss">
  @import '../styles/rem.scss';
+
 #movie-page {
     padding-bottom: rem(135);
 }
+.hidden{
+  opacity: 0;
+}
+.show {
+   opacity: 1;
+ }
 </style>

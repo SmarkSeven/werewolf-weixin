@@ -1,5 +1,5 @@
 <template>
-  <div id="music-page">
+  <div id="music-page" v-show="show">
     <header-bar :leftOptions="leftOptions" title="一个音乐"></header-bar>
     <music-header :data="headerData" @on-click-play="play"></music-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
@@ -42,6 +42,7 @@ export default{
       authors: [],
       comments: [],
       related: [],
+      show: false,
       leftOptions: {
         showBack: true,
       },
@@ -103,6 +104,12 @@ export default{
         commentnum: this.update.commentnum,
       };
     },
+  },
+  created() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
   },
   beforeRouteEnter(to, from, next) {
     // 音乐内容ID

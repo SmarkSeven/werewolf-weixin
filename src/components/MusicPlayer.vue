@@ -61,7 +61,7 @@ export default{
     // 歌唱者
     audioAuthor() {
       if (this.playIndex > -1 && this.playList.length > 0) {
-        return this.playList[this.playIndex].audioAuthor;
+        return this.playList[this.playIndex].musicAuthor;
       }
       return ' ';
     },
@@ -409,6 +409,7 @@ export default{
         font-size: 11px;
         background: url('../assets/xiami_logo.png') no-repeat;
         background-size: rem(40) rem(40);
+        background-position: 0 48%;
       }
       .collect {
         right: rem(110);

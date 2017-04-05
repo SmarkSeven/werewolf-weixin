@@ -4,9 +4,13 @@
         <img src="../assets/individual_center.png" alt="profile" slot="left" @click="toProfile">
         <div slot="right" @click="toSearch">Search</div>
       </header-bar>
-      <loadmore class="loadmore" id="load-more" style="padding-top: 46px;padding-bottom: 50px;" :bottomAllLoaded="allLoaded" :top-method="loadTop" :bottom-method="loadBottom" ref="loadmore">
-      <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @click-like="like" @on-img-click="showImg" @on-card-click="showPage"></card>
-     </loadmore>
+      <main>
+        <div class="loadmore-wrapper" :style="{ height: wrapperHeight + 'px' }" ref="wrapper">
+         <loadmore class="loadmore" id="load-more"  :bottom-method="loadBottom" ref="loadmore">
+           <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @click-like="like" @on-img-click="showImg" @on-card-click="showPage"></card>
+         </loadmore>
+        </div>
+      </main>
       <tabbar>
         <tabbar-item :selected="path === '/'" ref="tab-home" link="/">
           <div slot="icon">
@@ -61,6 +65,7 @@ export default {
   data() {
     return {
       allLoaded: false,
+      wrapperHeight: 0,
     };
   },
   computed: {
@@ -81,6 +86,7 @@ export default {
       musicList: state => state.one.musicList,
       movieList: state => state.one.movieList,
       praiseContents: state => state.storage.praiseContents,
+      savedPosition: state => state.one.savedPosition,
     }),
     title() {
       switch (this.path) {
@@ -120,28 +126,40 @@ export default {
       if (to.path === '/' && vm.currentIndex === vm.maxIndex) {
         vm.allLoaded = true;
       }
+      if (to.path !== '/') {
+        vm.allLoaded = false;
+      }
       if (vm.pathDataMap[vm.path].length === 0) {
         vm.getData();
       }
+      const position = vm.savedPosition[to.path];
+      if (position) {
+        vm.$refs.wrapper.scrollTop = position.top;
+      }
     });
   },
+  // beforeRouteUpdate (to, from, next) {
+  //   next();
+  // },
   beforeRouteLeave(to, from, next) {
-    // 导航离开该组件的对应路由时调用
-    if (from.path === '/') {
-      this.allLoaded = false;
-    }
+    // 离开时记录滚动位置
+    console.log('leave', this.$refs.wrapper);
+    this.updateSavedPosition({
+      path: from.path,
+      position: { top: this.$refs.wrapper.scrollTop, left: this.$refs.wrapper.scrollLeft },
+    });
     next();
   },
   watch: {
     maxIndex() {
-      if (this.maxIndex === this.currentIndex) {
+      if (this.maxIndex === this.currentIndex && this.currentIndex > -1) {
         this.allLoaded = true;
       } else {
         this.allLoaded = false;
       }
     },
     currentIndex() {
-      if (this.currentIndex === this.maxIndex) {
+      if (this.currentIndex === this.maxIndex && this.currentIndex > -1) {
         this.allLoaded = true;
       } else {
         this.allLoaded = false;
@@ -164,6 +182,7 @@ export default {
       'pushPraiseContentId',
       'deletePraiseContentId',
       'updatePraisenum',
+      'updateSavedPosition',
     ]),
     ...mapActions(['praise']),
     type(category) {
@@ -200,16 +219,10 @@ export default {
       this.$router.push({ path: `/${path}/${cardInfo.contentId}` });
     },
     showImg() {
-      console.log('show img');
-    },
-    loadTop() {
-      // load more data
-      console.log('Top loadMore');
-      setTimeout(this.$refs.loadmore.onTopLoaded, 2000);
     },
     loadBottom() {
       this.getData();
-      this.$refs.loadmore.onBottomLoaded();
+      setTimeout(this.$refs.loadmore.onBottomLoaded, 2000);
     },
     toProfile() {
       this.$router.push('profile');
@@ -244,8 +257,13 @@ export default {
       // 获取数据
       try {
         if (this.path === '/') {
-          this.fetchOneList();
-          window.scrollTo(0, 0);
+          // this.fetchOneList();
+          if (this.currentIndex === -1) {
+            this.fetchOneList();
+          } else {
+            this.fetchOneData();
+          }
+          // window.scrollTo(0, 0);
         } else if (this.path === '/reading') {
           this.fetchReadingData();
         } else if (this.path === '/music') {
@@ -258,24 +276,38 @@ export default {
       }
     },
     async fetchOneList() {
-      // 获取每日列表
-      if (this.currentIndex < 0 || !this.allLoaded) {
-        this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
-      }
       // 获取每日列表的id列表
-      let resp = await this.$http.get(`${this.host}/onelist/idlist`);
+      const resp = await this.$http.get(`${this.host}/onelist/idlist`);
       const result = resp.data;
       if (result.res === 0) {
         this.updateOneIdList({ oneIdList: result.data });
         this.updateMaxIndex({ maxIndex: result.data.length - 1 });
+        this.fetchOneData();
+      }
+      // const oneListId = this.oneIdList[this.currentIndex];
+      // 获取每日列表内容
+      // resp = await this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`);
+      // if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
+      //   this.updateOneList({ oneList: resp.data.data.content_list });
+      //   this.updateWeather({ weather: resp.data.data.weather });
+      // }
+    },
+    fetchOneData() {
+      // 获取每日列表
+      if (this.currentIndex < this.maxIndex) {
+        this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
       }
       const oneListId = this.oneIdList[this.currentIndex];
-      // 获取每日列表内容
-      resp = await this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`);
-      if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
-        this.updateOneList({ oneList: resp.data.data.content_list });
-        this.updateWeather({ weather: resp.data.data.weather });
-      }
+      this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`)
+      .then((resp) => {
+        if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
+          this.updateOneList({ oneList: resp.data.data.content_list });
+          this.updateWeather({ weather: resp.data.data.weather });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     },
     async fetchReadingData() {
       // 获取阅读列表
@@ -314,6 +346,9 @@ export default {
       }
     },
   },
+  mounted() {
+    this.wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
+  },
 };
 </script>
 
@@ -331,6 +366,18 @@ html, body {
     width: 46px;
    }
   }
+  main {
+      padding-top: 46px;
+      padding-bottom: 50px;
+    .loadmore-wrapper {
+      overflow: scroll;
+    }
+    .loadmore {
+      overflow: hidden;
+    }
+  }
+
+
 }
 .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label span {
   color: hsla(0, 100%, 10%, .7);

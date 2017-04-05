@@ -79,7 +79,6 @@ export default {
     },
     comment() {
       this.$emit('on-comment');
-      alert(navigator.share);
     },
     cliclComentLabel() {
       const body = document.querySelector('body');

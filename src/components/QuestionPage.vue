@@ -1,6 +1,6 @@
 <template>
-  <div id='question-page'>
-    <header-bar></header-bar>
+  <div id='question-page' v-show="show">
+    <header-bar :leftOptions="leftOptions" title="阅读·问答"></header-bar>
     <question-header :title="title" :content="questionContent" :asker="asker" :answerer="answerer"></question-header>
     <hp :content="answerContent" :copyright="copyright" :hpAuthorIntroduce="hpAuthorIntroduce"></hp>
     <div class="divide-line"></div>
@@ -41,6 +41,10 @@ export default{
       question: null,
       comments: [],
       related: [],
+      show: false,
+      leftOptions: {
+        showBack: true,
+      },
       // update: {
       //   praisenum: '0',
       //   sharenum: '0',
@@ -91,6 +95,12 @@ export default{
         commentnum: this.question.commentnum,
       };
     },
+  },
+  created() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
   },
   beforeRouteEnter(to, from, next) {
     // 文章内容ID

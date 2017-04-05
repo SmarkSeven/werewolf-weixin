@@ -224,7 +224,7 @@ html {
     margin-bottom: rem(44);
     height: rem(64);
     font-size: 12px;
-    -webkit-transform: scale(0.83);
+    transform: scale(0.83);
     text-align: center;
   }
   .title {
@@ -248,7 +248,7 @@ html {
   }
   .img-border {
     text-align: center;
-    -webkit-transform: scale(0.55);
+    transform: scale(0.55);
     font-size: 12px;
     font-weight: 600;
   }
@@ -275,9 +275,12 @@ html {
     div {
       display: inline-block;
       -webkit-transform-origin-x: 0;
-      -webkit-transform: scale(0.7);
+      transform: scale(0.7);
       font-size: 12px;
       font-weight: 600;
+    }
+    .date {
+      float: left;
     }
     .like-num, .like-btn, .share-btn {
       float: right;
@@ -356,7 +359,7 @@ html {
     padding-top: rem(20);
     padding-left: rem(80);
     -webkit-transform-origin-x: 0;
-    -webkit-transform: scale(0.85);
+    transform: scale(0.85);
     font-size: 12px;
     font-weight: 400;
   }
