@@ -28,7 +28,7 @@ body {
   background-color: #fff;
 }
 #app {
-  // height: 100%;
+  height: 100%;
   .player {
     height: 100%;
     width: 100%;

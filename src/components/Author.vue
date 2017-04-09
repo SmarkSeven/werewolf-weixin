@@ -32,7 +32,8 @@ export default{
   },
   methods: {
     onClick() {
-      this.$emit('on-click-item', this.author.user_id);
+      this.$router.push({ path: `/author/${this.author.user_id}` });
+      // this.$emit('on-click-item', this.author.user_id);
     },
     follow() {
       if (this.author.is_settled !== '0') {

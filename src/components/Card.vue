@@ -151,7 +151,7 @@ export default{
       'updatePlayState',
       'updatePlayId',
       'updateShowMusicPlayer']),
-    ...mapActions(['fetchAudioFromXiami']),
+    ...mapActions(['fetchAudioFromXiami', 'praise']),
     play() {
       // 当前音乐正在播放
       if (this.musicId === this.playId && this.playState === 'playing') {
@@ -198,10 +198,29 @@ export default{
       if (cardItem.content_type === '1' && this.cardItem.tag_list.length === 0) {
         this.updateReadingAuthorName({ authorName: cardItem.author.user_name });
       }
-      this.$emit('on-card-click', this.cardInfo);
+      // this.$emit('on-card-click', this.cardInfo);
+      let path = '';
+      if (cardItem.category === '0') {
+        return;
+      } else if (cardItem.category === '1') { // 前往阅读视图
+        path = 'essay';
+      } else if (cardItem.category === '3') { // 前往问答视图
+        path = 'question';
+      } else if (cardItem.category === '4') { // 前往音乐视图
+        path = 'music';
+      } else if (cardItem.category === '5') {
+        path = 'movie';
+      }
+      this.$router.push({ path: `/${path}/${cardItem.content_id}` });
     },
     like() {
-      this.$emit('click-like', this.cardInfo);
+      const praisePayload = {
+        id: Number(this.cardItem.id),
+        category: Number(this.cardItem.content_type),
+        contentId: Number(this.cardItem.content_id),
+        storyId: Number(this.cardItem.movie_story_id),
+      };
+      this.praise(praisePayload);
     },
     share() {
       this.$emit('click-share', this.cardInfo);

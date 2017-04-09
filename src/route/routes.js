@@ -9,6 +9,8 @@ import MusicPage from '../components/MusicPage';
 import MoviePage from '../components/MoviePage';
 import QuestionPage from '../components/QuestionPage';
 import VideoPage from '../components/VideoPage';
+import AuhtorPage from '../components/AuthorPage.vue';
+import SearchResultPage from '../components/SearchResultPage';
 
 const routes = [
   {
@@ -34,6 +36,10 @@ const routes = [
   {
     path: '/search',
     component: Search,
+  },
+  {
+    path: '/search/:key',
+    component: SearchResultPage,
   },
   {
     path: '/profile/ablsum',
@@ -69,6 +75,10 @@ const routes = [
   {
     path: '/question/:id',
     component: QuestionPage,
+  },
+  {
+    path: '/author/:authorId',
+    component: AuhtorPage,
   },
 ];
 

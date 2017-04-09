@@ -5,9 +5,9 @@
         <div slot="right" @click="toSearch">Search</div>
       </header-bar>
       <main>
-        <div class="loadmore-wrapper" :style="{ height: wrapperHeight + 'px' }" ref="wrapper">
-         <loadmore class="loadmore" id="load-more"  :bottom-method="loadBottom" ref="loadmore">
-           <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @click-like="like" @on-img-click="showImg" @on-card-click="showPage"></card>
+        <div class="loadmore-wrapper" ref="wrapper">
+         <loadmore class="loadmore" id="load-more" :maxDistance="0" :bottom-method="loadBottom" :distanceIndex="0.8" ref="loadmore">
+           <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @on-img-click="showImg" ></card>
          </loadmore>
         </div>
       </main>
@@ -18,7 +18,7 @@
           </div>
           <span slot="label">首页</span>
         </tabbar-item>
-        <tabbar-item link="/reading":selected="path === '/reading'" >
+        <tabbar-item link="/reading" :selected="path === '/reading'" >
           <div slot="icon">
               <x-icon type="ios-paper" :size="27"></x-icon>
           </div>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { ViewBox, Scroller, ButtonTab, ButtonTabItem, Spinner, Group, Cell, Tabbar, TabbarItem } from 'vux';
+import { ViewBox, ButtonTab, ButtonTabItem, Spinner, Group, Cell, Tabbar, TabbarItem } from 'vux';
 import { mapState, mapMutations, mapActions } from 'vuex';
 import { Loadmore } from 'mint-ui';
 import HeaderBar from './HeaderBar';
@@ -50,7 +50,6 @@ import Card from './Card';
 export default {
   components: {
     ViewBox,
-    Scroller,
     Group,
     Cell,
     ButtonTab,
@@ -65,7 +64,7 @@ export default {
   data() {
     return {
       allLoaded: false,
-      wrapperHeight: 0,
+      loadmoreToggle: false,
     };
   },
   computed: {
@@ -123,49 +122,46 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      if (to.path === '/' && vm.currentIndex === vm.maxIndex) {
-        vm.allLoaded = true;
-      }
-      if (to.path !== '/') {
-        vm.allLoaded = false;
-      }
       if (vm.pathDataMap[vm.path].length === 0) {
         vm.getData();
       }
       const position = vm.savedPosition[to.path];
       if (position) {
+        if (to.path === '/') {
+          console.log('enter:', position.top);
+        }
         vm.$refs.wrapper.scrollTop = position.top;
       }
     });
   },
-  // beforeRouteUpdate (to, from, next) {
-  //   next();
-  // },
   beforeRouteLeave(to, from, next) {
+    const top = this.$refs.wrapper.scrollTop;
+    if (from.path === '/') {
+      console.log('leave', top);
+    }
     // 离开时记录滚动位置
-    console.log('leave', this.$refs.wrapper);
     this.updateSavedPosition({
       path: from.path,
-      position: { top: this.$refs.wrapper.scrollTop, left: this.$refs.wrapper.scrollLeft },
+      position: { top, left: 0 },
     });
     next();
   },
-  watch: {
-    maxIndex() {
-      if (this.maxIndex === this.currentIndex && this.currentIndex > -1) {
-        this.allLoaded = true;
-      } else {
-        this.allLoaded = false;
-      }
-    },
-    currentIndex() {
-      if (this.currentIndex === this.maxIndex && this.currentIndex > -1) {
-        this.allLoaded = true;
-      } else {
-        this.allLoaded = false;
-      }
-    },
-  },
+  // watch: {
+  //   maxIndex() {
+  //     if (this.maxIndex === this.currentIndex && this.currentIndex > -1) {
+  //       this.allLoaded = true;
+  //     } else {
+  //       this.allLoaded = false;
+  //     }
+  //   },
+  //   currentIndex() {
+  //     if (this.currentIndex === this.maxIndex && this.currentIndex > -1) {
+  //       this.allLoaded = true;
+  //     } else {
+  //       this.allLoaded = false;
+  //     }
+  //   },
+  // },
   methods: {
     ...mapMutations([
       'updateLastReadingId',
@@ -203,52 +199,19 @@ export default {
           return '';
       }
     },
-    showPage(cardInfo) {
-      let path = '';
-      if (cardInfo.category === 0) {
-        return;
-      } else if (cardInfo.category === 1) { // 前往阅读视图
-        path = 'essay';
-      } else if (cardInfo.category === 3) { // 前往问答视图
-        path = 'question';
-      } else if (cardInfo.category === 4) { // 前往音乐视图
-        path = 'music';
-      } else if (cardInfo.category === 5) {
-        path = 'movie';
-      }
-      this.$router.push({ path: `/${path}/${cardInfo.contentId}` });
-    },
     showImg() {
     },
     loadBottom() {
-      this.getData();
-      setTimeout(this.$refs.loadmore.onBottomLoaded, 2000);
+      if (this.loadmoreToggle) {
+        this.getData();
+        setTimeout(this.$refs.loadmore.onBottomLoaded, 2000);
+      }
     },
     toProfile() {
       this.$router.push('profile');
     },
     toSearch() {
       this.$router.push('search');
-    },
-    like(cardInfo) {
-      let category;
-      const path = this.path;
-      if (path === '/') {
-        category = 0;
-      } else if (path === '/reading') {
-        category = 1;
-      } else if (path === '/music') {
-        category = 4;
-      } else {
-        category = 5;
-      }
-      const praisePayload = {
-        id: cardInfo.id,
-        category,
-        contentId: cardInfo.contentId,
-        storyId: cardInfo.storyId,
-      };
-      this.praise(praisePayload);
     },
     share() {
       console.log('I want to share it whith my freinds.');
@@ -263,7 +226,6 @@ export default {
           } else {
             this.fetchOneData();
           }
-          // window.scrollTo(0, 0);
         } else if (this.path === '/reading') {
           this.fetchReadingData();
         } else if (this.path === '/music') {
@@ -284,13 +246,6 @@ export default {
         this.updateMaxIndex({ maxIndex: result.data.length - 1 });
         this.fetchOneData();
       }
-      // const oneListId = this.oneIdList[this.currentIndex];
-      // 获取每日列表内容
-      // resp = await this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`);
-      // if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
-      //   this.updateOneList({ oneList: resp.data.data.content_list });
-      //   this.updateWeather({ weather: resp.data.data.weather });
-      // }
     },
     fetchOneData() {
       // 获取每日列表
@@ -347,7 +302,9 @@ export default {
     },
   },
   mounted() {
-    this.wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
+    const wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
+    this.$refs.wrapper.style.height = `${wrapperHeight}px`;
+    this.loadmoreToggle = true;
   },
 };
 </script>
@@ -359,7 +316,8 @@ html, body {
 }
 #home-container {
   height: 100%;
-  // overflow: hidden;
+  overflow: hidden;
+  background: #fbfbfb;
   .header {
    img {
     height: 46px;
@@ -367,17 +325,18 @@ html, body {
    }
   }
   main {
+      height: 100%;
       padding-top: 46px;
       padding-bottom: 50px;
+
     .loadmore-wrapper {
       overflow: scroll;
+      // -webkit-overflow-scrolling: auto;
     }
     .loadmore {
-      overflow: hidden;
+      -webkit-overflow-scrolling: auto;
     }
   }
-
-
 }
 .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label span {
   color: hsla(0, 100%, 10%, .7);
@@ -388,24 +347,24 @@ html, body {
 .weui-bar__item_on .vux-x-icon {
   fill: hsla(0, 100%, 0%, .7);
 }
-div.weui-tabbar{
-  position: fixed;
-}
-.rotate {
-  transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-}
-.pullup-arrow {
-  display: block;
-  transition: all linear 0.2s;
-  -webkit-transition: all linear 0.2s;
-  color: #666;
-  font-size: 25px;
-}
-.scroller-container{
-  height: 100%;
-}
-#vux-scroller-2811y {
-  height: calc(100%-96px);
-}
+// div.weui-tabbar{
+//   position: fixed;
+// }
+// .rotate {
+//   transform: rotate(180deg);
+//   -webkit-transform: rotate(180deg);
+// }
+// .pullup-arrow {
+//   display: block;
+//   transition: all linear 0.2s;
+//   -webkit-transition: all linear 0.2s;
+//   color: #666;
+//   font-size: 25px;
+// }
+// .scroller-container{
+//   height: 100%;
+// }
+// #vux-scroller-2811y {
+//   height: calc(100%-96px);
+// }
 </style>

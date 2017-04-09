@@ -1,12 +1,11 @@
 <template>
   <div class="loadmore">
-    <div class="wrapper" ref="loadmore-wrapper" :style="{ height: wrapperHeight + 'px' }">
-      <loadmore :bottom-method="loadBottom" class="mint-loadmore" :bottom-all-loaded="allLoaded" ref="loadmore">
+    <div class="wrapper" ref="wrapper" :style="{ height: wrapperHeight + 'px' }">
+      <div :bottom-method="loadBottom" class="mint-loadmore" :bottom-all-loaded="allLoaded" ref="loadmore">
         <ul class="list">
           <li v-for="item in list" class="listitem">{{ item }}</li>
         </ul>
-
-      </loadmore>
+      </div>
     </div>
   </div>
 </template>
@@ -30,8 +29,8 @@ export default {
     loadBottom() {
       setTimeout(() => {
         const lastValue = this.list[this.list.length - 1];
-        if (lastValue < 40) {
-          for (let i = 1; i <= 10; i += 1) {
+        if (lastValue < 400) {
+          for (let i = 1; i <= 50; i += 1) {
             this.list.push(lastValue + i);
           }
         } else {
@@ -45,7 +44,7 @@ export default {
     },
   },
   created() {
-    for (let i = 1; i <= 20; i += 1) {
+    for (let i = 1; i <= 600; i += 1) {
       this.list.push(i);
     }
   },
@@ -64,9 +63,10 @@ export default {
           border-top: solid 1px #eee;
         }
       }
-      .loadmore {
-        text-align: center;
-      }
+      // .loadmore {
+      //   text-align: center;
+      //   background-color: white;
+      // }
        .desc {
         text-align: center;
         color: #666;
@@ -87,9 +87,17 @@ export default {
         transform: rotate(180deg);
       }
   .wrapper {
-    overflow: scroll;
+    overflow: auto;
+    background-color: black;
   }
   .mint-loadmore {
-    overflow: hidden;
+    // overflow: hidden;
+    text-align: center;
+    -webkit-overflow-scrolling: touch;
+      // -webkit-overflow-scrolling: auto;
+  }
+  ul {
+    height: 100%;
+    background-color: white;
   }
 </style>

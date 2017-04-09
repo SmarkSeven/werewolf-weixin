@@ -7,13 +7,7 @@
     <related-label v-if="related.length > 0"></related-label>
     <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
     <comment-label></comment-label>
-    <ul v-infinite-scroll="loadMore"
-      infinite-scroll-disabled="loading"
-      infinite-scroll-distance="10">
-      <li>
-        <comment v-for="(comment,index) in comments" :comment="comment" :key="comment.id"></comment>
-      </li>
-    </ul>
+    <comment-list :contentId="$route.params.id" type="essay"></comment-list>
     <footer-bar :data="footerData"></footer-bar>
   </div>
 </template>
@@ -28,6 +22,7 @@ import FooterBar from './FooterBar';
 import HeaderBar from './HeaderBar';
 import EssayHeader from './EssayHeader';
 import Hp from './Hp';
+import CommentList from './CommentList';
 
 export default{
   components: {
@@ -40,6 +35,7 @@ export default{
     RelatedLabel,
     Related,
     FooterBar,
+    CommentList,
   },
   data() {
     return {
@@ -149,6 +145,9 @@ export default{
       try {
         const resp = await this.$http.get(`${this.host}/comment/praiseandtime/essay/${contentId}/${commentId}?${this.basicQueryString}`);
         const result = resp.data;
+        if (commentId > 0) {
+          this.loading = false;
+        }
         if (result.res === 0 && result.data) {
           // this.comments = result.data.data;
           console.log(result.data);

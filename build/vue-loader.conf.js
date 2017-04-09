@@ -12,7 +12,11 @@ module.exports = {
   postcss: [
     require('autoprefixer')({
       browsers: ['iOS >= 7', 'Android >= 4.1']
-    })
+    }),
+    // require('precss')({ /* options */ }),
+    // require('postcss-modules')({
+    //   // scopeBehaviour: 'global',
+    // }),
   ],
   vue: {
     loaders: {
