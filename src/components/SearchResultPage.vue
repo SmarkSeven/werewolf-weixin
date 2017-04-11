@@ -1,9 +1,13 @@
 <template>
   <div class="search-reslut-page">
     <div class="header">
-      <div class="back"></div>
-      <input type="text">
-      <div class="search-btn"></div>
+      <div class="back" @click="back">
+         <x-icon type="ios-arrow-left" size="30"></x-icon>
+      </div>
+      <input type="text" ref="input" @keyup.13="onInput">
+      <div class="search-btn" @click="search">
+        <x-icon type="ios-search-strong" size="30"></x-icon>
+      </div>
     </div>
     <main>
       <mt-navbar v-model="selected" :fixed="true" @input="change">
@@ -13,26 +17,75 @@
         <mt-tab-item id="movie">影视</mt-tab-item>
         <mt-tab-item id="author">作者/音乐人</mt-tab-item>
       </mt-navbar>
-      <mt-tab-container v-model="selected">
-        <mt-tab-container-item v-for="(tab,index) in tabs"
-          :key="index"
-          :id="tab"
-          v-infinite-scroll="loadMore">
-          <div v-if="selected === 'hp'">
-            <cell v-for="item in data" :imgUrl="item.hp_img_url" :sub="item.hp_title" :content="item.hp_content" :id="item.id" type="hp" :key="/>
-          </div>
-          <div v-if="selected === 'reading'">
-            <cell v-for="item in data" sub="阅读" :content="item.title" :id="item.id" :type="item.type"/>
-          </div>
-          <div v-if="selected === 'music'">
-            <cell v-for="item in data" :imgUrl="item.cover" :sub="item.title" :content="item.author.user_name" :id="item.id" type="music"/>
-          </div>
-          <div v-if="selected === 'movie'">
-            <cell v-for="item in data" sub="影视" :content="item.title" :id="item.id" tpe="movie"/>
-          </div>
-          <div v-if="selected === 'author'">
-            <cell v-for="item in data" :imgUrl="item.web_url" :sub="item.desc" :content="item.user_name" :id="item.id" type="author"/>
-          </div>
+      <mt-tab-container
+        id="tabContainer"
+        v-model="selected"
+        v-infinite-scroll="loadMore"
+        :infinite-scroll-disabled="loading"
+        infinite-scroll-distance="10"
+        infinite-scroll-immediate-check="false">
+        <mt-tab-container-item v-for="(tab,index) in tabs" :key="index" :id="tab">
+            <div v-if="selected === 'hp'">
+              <transition-group name="list" tag="div">
+                <cell v-for="item in data"
+                  :key="item.hpcontent_id"
+                  :imgUrl="item.hp_img_url || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='"
+                  :sub="item.hp_title"
+                  :content="item.hp_content"
+                  :id="item.hpcontent_id"
+                  type="hp">
+                </cell>
+              </transition-group>
+            </div>
+            <div v-if="selected === 'reading'">
+              <transition-group name="list" tag="div">
+                <cell v-for="item in data"
+                  :sub="item.type | readingType"
+                  :content="item.title"
+                  :id="item.id"
+                  :type="item.type"
+                  :key="item.id">
+                </cell>
+              </transition-group>
+            </div>
+            <div v-if="selected === 'music'">
+              <transition-group name="list" tag="div">
+                <cell v-for="item in data"
+                  :imgUrl="item.cover || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='"
+                  :sub="item.title"
+                  :content="item.author.user_name"
+                  :id="item.id"
+                  type="music"
+                  :key="item.id">
+                </cell>
+              </transition-group>
+            </div>
+            <div v-if="selected === 'movie'">
+              <transition-group name="list" tag="div">
+                <cell v-for="item in data"
+                  sub="影视"
+                  :content="item.title"
+                  :id="item.id"
+                  type="movie"
+                  :key="item.id">
+                </cell>
+              </transition-group>
+            </div>
+            <div v-if="selected === 'author'">
+              <transition-group name="list" tag="div">
+                <cell v-for="item in data"
+                  :imgUrl="item.web_url || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='"
+                  :sub="item.desc"
+                  :content="item.user_name"
+                  :id="item.user_id"
+                  type="author"
+                  :key="item.user_id">
+                </cell>
+              </transition-group>
+            </div>
+            <div v-if="data.length === 0" class="no-search-result">
+              <x-icon type="social-buffer-outline" size="40"></x-icon>
+            </div>
         </mt-tab-container-item>
       </mt-tab-container>
     </main>
@@ -53,7 +106,8 @@ export default{
   },
   data() {
     return {
-      num: 20,
+      savedPostion: {},
+      loading: false,
       selected: 'hp',
       data: [],
       tempData: [],
@@ -72,27 +126,51 @@ export default{
       basicQueryString: state => state.one.basicQueryString,
     }),
   },
+  filters: {
+    readingType(type) {
+      if (type === 'essay') {
+        return '阅读';
+      }
+      if (type === 'question') {
+        return '问答';
+      }
+      if (type === 'serialcontent') {
+        return '连载';
+      }
+    },
+  },
   methods: {
     async fetchData(keyword, path) {
       const resp = await this.$http.get(`${this.host}/search/${path}/${keyword}`);
       const result = resp.data;
       if (resp.status === 200 && result.res === 0) {
         switch (path) {
-          case 'hp':
+          case 'hp': {
+            this.selected = 'hp';
+            this.hp.splice(0, this.hp.length);
+            this.data.splice(0, this.data.length);
+            this.tempData.splice(0, this.tempData.length);
             this.hp.push(...result.data);
             this.tempData = this.hp;
             this.data.push(...this.tempData.slice(0, 20));
+            const container = document.querySelector('.mint-tab-container');
+            container.scrollTop = 0;
             break;
+          }
           case 'reading':
+            this.reading.splice(0, this.reading.length);
             this.reading.push(...result.data);
             break;
           case 'music':
+            this.music.splice(0, this.music.length);
             this.music.push(...result.data);
             break;
           case 'movie':
+            this.movie.splice(0, this.movie.length);
             this.movie.push(...result.data);
             break;
           case 'author':
+            this.author.splice(0, this.author.length);
             this.author.push(...result.data);
             break;
           default:
@@ -131,10 +209,27 @@ export default{
     },
     loadMore() {
       this.loading = true;
-      setTimeout(() => {
-        this.data.push(...this.tempData.slice(this.data.length, this.data.length + 10));
-        this.loading = false;
-      }, 400);
+      this.data.push(...this.tempData.slice(this.data.length, this.data.length + 10));
+      this.loading = false;
+    },
+    setContainerHieght() {
+      const tabContainer = document.querySelector('#tabContainer');
+      const height = document.documentElement.clientHeight - tabContainer.getBoundingClientRect().top;
+      tabContainer.style.height = `${height}px`;
+    },
+    back() {
+      this.$router.go(-1);
+    },
+    onInput() {
+      this.$refs.input.blur();
+      this.search();
+    },
+    search() {
+      const keyword = this.$refs.input.value.trim();
+      if (keyword === '') {
+        return;
+      }
+      this.$router.push({ path: `/search/${keyword}` });
     },
   },
   created() {
@@ -143,6 +238,30 @@ export default{
     this.fetchData(this.params.key, 'music');
     this.fetchData(this.params.key, 'movie');
     this.fetchData(this.params.key, 'author');
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.savedPostion = {};
+    this.fetchData(to.params.key, 'hp');
+    this.fetchData(to.params.key, 'reading');
+    this.fetchData(to.params.key, 'music');
+    this.fetchData(to.params.key, 'movie');
+    this.fetchData(to.params.key, 'author');
+    next();
+  },
+  watch: {
+    selected(val, oldVal) {
+      // 记录每个列表滑动位置
+      const container = document.querySelector('.mint-tab-container');
+      this.savedPostion[oldVal] = container.scrollTop;
+      container.scrollTop = this.savedPostion[val];
+    },
+  },
+  mounted() {
+    this.setContainerHieght();
+    window.addEventListener('resize', this.setContainerHieght);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.setContainerHieght);
   },
 };
 </script>
@@ -155,9 +274,14 @@ export default{
   align-items: center;
   background: #f8f8f8;
   div {
+    display: inline-block;
+    padding-top: 6px;
     height: 100%;
-    width: 40px;
-    display: inline-block
+    width: rem(140);
+    text-align: center;
+    .vux-x-icon {
+      fill: #a0a0a0;
+    }
   }
   input[type=text] {
     width: rem(800);
@@ -190,10 +314,20 @@ main {
 .mint-tab-container {
   margin-top: 45px;
   padding: 0 rem(90);
+  overflow: scroll;
 }
-.no-result-notice {
-  height: rem(100);
-  width: rem(100);
-  background: black;
+.no-search-result {
+  display: flex;
+  height: rem(1200);
+  justify-content: center;
+  align-items: center;
+}
+// 过渡样式
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-active {
+  opacity: 0;
+  transform: translateX(150px);
 }
 </style>

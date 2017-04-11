@@ -6,8 +6,10 @@
       </header-bar>
       <main>
         <div class="loadmore-wrapper" ref="wrapper">
-         <loadmore class="loadmore" id="load-more" :maxDistance="0" :bottom-method="loadBottom" :distanceIndex="0.8" ref="loadmore">
-           <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @on-img-click="showImg" ></card>
+         <loadmore class="loadmore" id="load-more" :autoFill="false" :bottom-method="loadBottom" :distanceIndex="1" ref="loadmore">
+           <transition-group name="list" mode="in-out" tag="div">
+            <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @on-img-click="showImg" ></card>
+           </transition-group>
          </loadmore>
         </div>
       </main>
@@ -43,7 +45,7 @@
 <script>
 import { ViewBox, ButtonTab, ButtonTabItem, Spinner, Group, Cell, Tabbar, TabbarItem } from 'vux';
 import { mapState, mapMutations, mapActions } from 'vuex';
-import { Loadmore } from 'mint-ui';
+import { Loadmore, Toast } from 'mint-ui';
 import HeaderBar from './HeaderBar';
 import Card from './Card';
 
@@ -60,6 +62,7 @@ export default {
     HeaderBar,
     Spinner,
     Card,
+    Toast,
   },
   data() {
     return {
@@ -146,22 +149,6 @@ export default {
     });
     next();
   },
-  // watch: {
-  //   maxIndex() {
-  //     if (this.maxIndex === this.currentIndex && this.currentIndex > -1) {
-  //       this.allLoaded = true;
-  //     } else {
-  //       this.allLoaded = false;
-  //     }
-  //   },
-  //   currentIndex() {
-  //     if (this.currentIndex === this.maxIndex && this.currentIndex > -1) {
-  //       this.allLoaded = true;
-  //     } else {
-  //       this.allLoaded = false;
-  //     }
-  //   },
-  // },
   methods: {
     ...mapMutations([
       'updateLastReadingId',
@@ -202,10 +189,8 @@ export default {
     showImg() {
     },
     loadBottom() {
-      if (this.loadmoreToggle) {
-        this.getData();
-        setTimeout(this.$refs.loadmore.onBottomLoaded, 2000);
-      }
+      this.getData();
+      setTimeout(this.$refs.loadmore.onBottomLoaded, 1000);
     },
     toProfile() {
       this.$router.push('profile');
@@ -251,18 +236,25 @@ export default {
       // 获取每日列表
       if (this.currentIndex < this.maxIndex) {
         this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
+        const oneListId = this.oneIdList[this.currentIndex];
+        this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`)
+        .then((resp) => {
+          if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
+            this.updateOneList({ oneList: resp.data.data.content_list });
+            this.updateWeather({ weather: resp.data.data.weather });
+            this.$refs.wrapper.scrollTop = 0;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      } else {
+        Toast({
+          message: ':-D 没有更多了',
+          position: 'bottom',
+          duration: 1000,
+        });
       }
-      const oneListId = this.oneIdList[this.currentIndex];
-      this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`)
-      .then((resp) => {
-        if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
-          this.updateOneList({ oneList: resp.data.data.content_list });
-          this.updateWeather({ weather: resp.data.data.weather });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
     },
     async fetchReadingData() {
       // 获取阅读列表
@@ -304,7 +296,6 @@ export default {
   mounted() {
     const wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
     this.$refs.wrapper.style.height = `${wrapperHeight}px`;
-    this.loadmoreToggle = true;
   },
 };
 </script>
@@ -346,6 +337,18 @@ html, body {
 }
 .weui-bar__item_on .vux-x-icon {
   fill: hsla(0, 100%, 0%, .7);
+}
+// 过渡样式
+.list-enter-active, .list-leave-active {
+  transition: all .5s;
+}
+.list-leave-active {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-enter {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 // div.weui-tabbar{
 //   position: fixed;

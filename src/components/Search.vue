@@ -16,7 +16,6 @@ export default{
   methods: {
     search(event) {
       const searchString = event.target.value;
-      // alert(searchString);
       this.$router.push({ path: `/search/${searchString}` });
     },
   },

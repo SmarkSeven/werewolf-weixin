@@ -124,10 +124,10 @@ export default {
       &:after {
         content: '';
         position: absolute;
-        top: 16px;
+        top: 17px;
         left: 15px;
-        height: 10px;
-        width: 10px;
+        height: 8px;
+        width: 8px;
         border: 2px solid transparent;
         border-left-color: gray;
         border-bottom-color: gray;
@@ -139,7 +139,7 @@ export default {
         top: 22px;
         left: 14px;
         height: 2px;
-        width: 20px;
+        width: 18px;
         background: gray;
       }
     }

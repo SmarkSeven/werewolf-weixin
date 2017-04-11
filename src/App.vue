@@ -1,7 +1,7 @@
 <template>
   <div id="app">
+    <router-view class="router-view"></router-view>
     <music-player class="player" v-show="showMusicPlayer"></music-player>
-    <router-view></router-view>
   </div>
 </template>
 
@@ -23,6 +23,7 @@ export default {
 </script>
 
 <style lang="less">
+@import '../src/styles/animate.css';
 @import '~vux/src/styles/reset.less';
 body {
   background-color: #fff;
@@ -37,5 +38,33 @@ body {
 }
 * {
   box-sizing: border-box;
+}
+.one-pop-out-enter-active,
+.one-pop-out-leave-active,
+.one-pop-in-enter-active,
+.one-pop-in-leave-active {
+  will-change: transform;
+  transition: all 500ms;
+  height: 100%;
+  top: 46px;
+  position: absolute;
+  backface-visibility: hidden;
+  perspective: 1000;
+}
+.one-pop-out-enter {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+.one-pop-out-leave-active {
+  opacity: 0;
+  transform: translateX(100%);
+}
+.one-pop-in-enter {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
+}
+.one-pop-in-leave-active {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
 }
 </style>

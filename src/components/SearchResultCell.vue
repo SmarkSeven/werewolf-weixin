@@ -19,6 +19,7 @@ export default{
   methods: {
     onClick() {
       console.log(this.type, this.id);
+      this.$router.push({ path: `/${this.type}/${this.id}` });
     },
   },
 };

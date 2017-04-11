@@ -25,6 +25,7 @@ Vue.use(VueRouter);
 Vue.prototype.$http = axios;
 Vue.use(LoadingPlugin);
 
+
 const store = new Vuex.Store({
   modules: {
     one,
