@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 export default {
   props: {
     leftOptions: {
@@ -52,7 +54,9 @@ export default {
     },
   },
   methods: {
+    ...mapMutations(['updateDirection']),
     onClickBack() {
+      this.updateDirection({ direction: 'back' });
       if (this.leftOptions.preventGoBack) {
         this.$emit('on-click-back');
       } else if (this.$router) {

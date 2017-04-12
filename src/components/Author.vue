@@ -9,40 +9,56 @@
         <p class="author-name">{{author.user_name}} <span class="web-name"> {{author.wb_name}}</span></p>
         <p class="author-desc">{{author.summary}}</p>
       </div>
-      <div class="btn-follow" :class="{'followed': isFollowe}" @click="follow">{{followBtnText}}</div>
+      <div class="btn-follow" :class="{'followed': isFollowed}" @click.stop="follow">{{followBtnText}}</div>
   </div>
 </div>
 
 </template>
 <script>
+import { mapState, mapMutations, mapActions } from 'vuex';
+
 export default{
   props: {
     author: Object,
   },
   computed: {
-    isFollowe() {
-      return Number(this.author.is_settled);
+    ...mapState({
+      followAuthors: state => state.storage.followAuthors,
+    }),
+    isFollowed() {
+      if (this.author) {
+        const index = this.followAuthors.indexOf(this.author.user_id);
+        if (index > -1) {
+          return true;
+        }
+      }
+      return false;
     },
     followBtnText() {
-      if (this.author.is_settled !== '0') {
+      if (this.isFollowed) {
         return '已关注';
       }
       return '关注';
     },
   },
   methods: {
+    ...mapMutations(['updateDirection']),
+    ...mapActions(['followAuthor']),
     onClick() {
+      this.updateDirection({ direction: 'forward' });
       this.$router.push({ path: `/author/${this.author.user_id}` });
       // this.$emit('on-click-item', this.author.user_id);
     },
     follow() {
-      if (this.author.is_settled !== '0') {
-        // 取消关组
-        this.author.is_settled = '0';
+      this.author.fans_total = Number(this.author.fans_total);
+      if (this.isFollowed) {
+        this.author.fans_total -= 1;
       } else {
-        // 关注作者
-        this.author.is_settled = '1';
+        this.author.fans_total += 1;
       }
+      this.followAuthor({
+        followUserId: this.author.user_id,
+      });
     },
   },
 };
@@ -117,7 +133,7 @@ export default{
         text-align: center;
         line-height: rem(60);
         font-size: 12px;
-        -webkit-transform: scale(0.74);
+        transform: scale(0.74);
         -webkit-transform-origin-x: 0;
         font-weight: 700;
         border-radius: rem(10);
@@ -126,7 +142,7 @@ export default{
     .followed {
       padding: rem(12) rem(25);
       color: white;
-      background: hsla(0, 90%, 0%, .65);
+      background: #555;
       font-weight: 600;
     }
   }

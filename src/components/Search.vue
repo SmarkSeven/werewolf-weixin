@@ -1,16 +1,26 @@
 <template>
   <div id="search-page">
-    <h2 class="title">一个搜索</h2>
-    <p class="slogan">搜索引擎就是把字典塞到硅片里</p>
-    <input type="text" class="input" ref="input" @keyup.13="search">
+    <header-bar :leftOptions="leftOptions"></header-bar>
+    <main>
+      <h2 class="title">一个搜索</h2>
+      <p class="slogan">搜索引擎就是把字典塞到硅片里</p>
+      <input type="text" class="input" ref="input" @keyup.13="search">
+    </main>
   </div>
 </template>
 
 <script>
+import HeaderBar from './HeaderBar';
 
 export default{
+  components: {
+    HeaderBar,
+  },
   data() {
     return {
+      leftOptions: {
+        showBack: true,
+      },
     };
   },
   methods: {
@@ -27,8 +37,13 @@ export default{
 <style lang="scss" scoped>
 @import '../styles/rem.scss';
 #search-page {
-  text-align: center;
-  padding: rem(190) rem(90);
+  height: 100%;
+  width: 100%;
+  main {
+    padding: rem(250) rem(90);
+    width: 100%;
+    text-align: center;
+  }
   .title {
     font-size: 21px;
     font-weight: 400;
@@ -53,5 +68,4 @@ export default{
     border-bottom: 2px solid black;
   }
 }
-
 </style>

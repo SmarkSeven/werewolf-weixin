@@ -41,13 +41,20 @@ const store = new Vuex.Store({
 const router = new VueRouter({
   mode: 'history',
   routes,
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      console.log(savedPosition);
-      return savedPosition;
-    }
-    return { x: 0, y: 0 };
-  },
+  // scrollBehavior(to, from, savedPosition) {
+  //   if (savedPosition) {
+  //     console.log(savedPosition);
+  //     return savedPosition;
+  //   }
+  //   return { x: 0, y: 0 };
+  // },
+});
+router.beforeEach((to, from, next) => {
+  const back = new RegExp('(^/$)|(^/reading$)|(^/music$)|(^/movie$)', 'g');
+  if (back.test(to.path)) {
+    console.log('back');
+  }
+  next();
 });
 
 FastClick.attach(document.body);

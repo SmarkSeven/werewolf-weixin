@@ -34,6 +34,8 @@ module.exports = {
       '/comment/unpraise': 'http://v3.wufazhuce.com:8000/api',
       '/collection/add': 'http://v3.wufazhuce.com:8000/api',
       '/collection/del': 'http://v3.wufazhuce.com:8000/api',
+      '/user/follow': 'http://v3.wufazhuce.com:8000/api',
+      '/user/follow_cancel': 'http://v3.wufazhuce.com:8000/api',
       // '/xiami/audio': {
       //   target: 'http://api.xiami.com',
       //   changeOrigin: true,

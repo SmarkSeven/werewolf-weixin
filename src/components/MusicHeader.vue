@@ -62,6 +62,7 @@ img[src=""] {
 .music-header {
   position: relative;
   padding-top: rem(1080);
+  overflow: hidden;
   .music-header-box {
     position: absolute;
     padding: rem(48);

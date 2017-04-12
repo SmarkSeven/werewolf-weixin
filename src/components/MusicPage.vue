@@ -42,7 +42,7 @@ export default{
       authors: [],
       comments: [],
       related: [],
-      show: false,
+      show: true,
       leftOptions: {
         showBack: true,
       },
@@ -228,5 +228,7 @@ export default{
  @import '../styles/rem.scss';
 #music-page {
     padding-bottom: rem(135);
+    height: 100%;
+    overflow: scroll;
 }
 </style>

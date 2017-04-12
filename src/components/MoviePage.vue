@@ -206,6 +206,8 @@ export default{
 
 #movie-page {
     padding-bottom: rem(135);
+    height: 100%;
+    overflow: scroll;
 }
 .hidden{
   opacity: 0;

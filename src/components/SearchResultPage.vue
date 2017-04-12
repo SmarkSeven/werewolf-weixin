@@ -1,5 +1,5 @@
 <template>
-  <div class="search-reslut-page">
+  <div id="search-reslut-page">
     <div class="header">
       <div class="back" @click="back">
          <x-icon type="ios-arrow-left" size="30"></x-icon>
@@ -83,7 +83,7 @@
                 </cell>
               </transition-group>
             </div>
-            <div v-if="data.length === 0" class="no-search-result">
+            <div v-if="data.length === 0 && loaded" class="no-search-result">
               <x-icon type="social-buffer-outline" size="40"></x-icon>
             </div>
         </mt-tab-container-item>
@@ -108,6 +108,7 @@ export default{
     return {
       savedPostion: {},
       loading: false,
+      loaded: false,
       selected: 'hp',
       data: [],
       tempData: [],
@@ -146,6 +147,7 @@ export default{
       if (resp.status === 200 && result.res === 0) {
         switch (path) {
           case 'hp': {
+            this.loaded = true;
             this.selected = 'hp';
             this.hp.splice(0, this.hp.length);
             this.data.splice(0, this.data.length);
@@ -267,6 +269,10 @@ export default{
 </script>
 <style lang="scss" scoped>
 @import '../styles/rem.scss';
+#search-reslut-page {
+  height: 100%;
+  width: 100%;
+}
 .header {
   display: flex;
   height: 42px;
@@ -328,6 +334,6 @@ main {
 }
 .list-enter, .list-leave-active {
   opacity: 0;
-  transform: translateX(150px);
+  transform: translateY(50px);
 }
 </style>

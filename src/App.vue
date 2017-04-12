@@ -1,7 +1,11 @@
 <template>
   <div id="app">
-    <router-view class="router-view"></router-view>
-    <music-player class="player" v-show="showMusicPlayer"></music-player>
+   <music-player class="player" v-show="showMusicPlayer"></music-player>
+    <transition
+      :name="direction === 'forward' ? 'one-pop-in' : 'one-pop-out'"
+    >
+      <router-view class="router-view"></router-view>
+    </transition>
   </div>
 </template>
 
@@ -17,7 +21,14 @@ export default {
   computed: {
     ...mapState({
       showMusicPlayer: state => state.one.showMusicPlayer,
+      direction: state => state.one.direction,
     }),
+    enterActiveClass() {
+      if (this.direction === 'forward') {
+        return 'animated fadeInRight';
+      }
+      return 'animated fadeInLeft';
+    },
   },
 };
 </script>
@@ -25,6 +36,9 @@ export default {
 <style lang="less">
 @import '../src/styles/animate.css';
 @import '~vux/src/styles/reset.less';
+* {
+  box-sizing: border-box;
+}
 body {
   background-color: #fff;
 }
@@ -36,8 +50,8 @@ body {
     z-index: 9999;
   }
 }
-* {
-  box-sizing: border-box;
+.router-view {
+  height: 100%;
 }
 .one-pop-out-enter-active,
 .one-pop-out-leave-active,
@@ -46,18 +60,18 @@ body {
   will-change: transform;
   transition: all 500ms;
   height: 100%;
-  top: 46px;
+  // top: 46px;
   position: absolute;
   backface-visibility: hidden;
   perspective: 1000;
 }
 .one-pop-out-enter {
   opacity: 0;
-  transform: translateX(-100%);
+  transform: translate3d(-100%, 0, 0);
 }
 .one-pop-out-leave-active {
   opacity: 0;
-  transform: translateX(100%);
+  transform: translate3d(100%, 0, 0);
 }
 .one-pop-in-enter {
   opacity: 0;
@@ -66,5 +80,16 @@ body {
 .one-pop-in-leave-active {
   opacity: 0;
   transform: translate3d(-100%, 0, 0);
+}
+
+.slide-fade-enter-active {
+  transition: all .4s ease;
+}
+.slide-fade-leave-active {
+  transition: all .4s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-active {
+  transform: translateX(100px);
+  opacity: 0;
 }
 </style>

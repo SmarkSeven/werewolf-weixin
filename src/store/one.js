@@ -3,6 +3,7 @@ const one = {
     host: 'http://v3.wufazhuce.com:8000/api',
     basicQueryString: 'user_id=7878484&channel=pp&version=4.0.7&uuid=00000000-41eb-998f-dab4-6c1045072748&platform=android',
     jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE0OTA1MjcwMjMsInVzZXJpZCI6IjUxMDU1NTQifQ.iHN9EPkMHV2u1BzsfbMbxr5NEb87Icf-P2Eu4AQMHLA',
+    userId: 7878484,
     weather: null,
     lastReadingId: 0,
     lastMusicId: 0,
@@ -17,6 +18,7 @@ const one = {
     movieList: [],  // 电影列表
     showMusicPlayer: false,  // 是否显示音乐播放控件
     savedPosition: {},
+    direction: 'forward', // 路由方向
   },
   mutations: {
     updateLastReadingId(state, payload) {
@@ -73,9 +75,11 @@ const one = {
     updateSavedPosition(state, payload) {
       state.savedPosition[payload.path] = payload.position;
     },
+    // 更新路由方向
+    updateDirection(state, payload) {
+      state.direction = payload.direction;
+    },
   },
-  actions: {},
-  getters: {},
 };
 
 export default one;

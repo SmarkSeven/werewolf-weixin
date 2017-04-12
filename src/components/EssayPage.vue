@@ -1,18 +1,18 @@
 <template>
-  <div id='essay-page' v-show="show">
-    <header-bar :leftOptions="leftOptions" title="一个阅读"></header-bar>
-    <essay-header :title="title" :authorName="author"></essay-header>
-    <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
-    <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
-    <related-label v-if="related.length > 0"></related-label>
-    <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
-    <comment-label></comment-label>
-    <comment-list :contentId="$route.params.id" type="essay"></comment-list>
-    <footer-bar :data="footerData"></footer-bar>
-  </div>
+    <div id='essay-page' v-show="show">
+      <header-bar :leftOptions="leftOptions" title="一个阅读"></header-bar>
+      <essay-header :title="title" :authorName="author"></essay-header>
+      <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
+      <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
+      <related-label v-if="related.length > 0"></related-label>
+      <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
+      <comment-label></comment-label>
+      <comment-list :contentId="$route.params.id" type="essay"></comment-list>
+      <footer-bar :data="footerData"></footer-bar>
+    </div>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
 import Comment from './Comment';
@@ -42,7 +42,7 @@ export default{
       essay: null,
       comments: [],
       related: [],
-      show: false,
+      show: true,
       leftOptions: {
         showBack: true,
       },
@@ -59,6 +59,7 @@ export default{
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
       authorName: state => state.reading.authorName,
+      savedPosition: state => state.one.savedPosition,
     }),
     title() {
       return this.essay && this.essay.hp_title;
@@ -109,7 +110,17 @@ export default{
     this.getData(contentId);
     next();
   },
+  beforeRouteLeave(to, from, next) {
+    const el = document.querySelector('#essay-page');
+    const top = el.scrollTop;
+    this.updateSavedPosition({
+      path: from.path,
+      position: { top },
+    });
+    next();
+  },
   methods: {
+    ...mapMutations(['updateSavedPosition']),
     getData(contentId) {
       this.getEssayData(contentId);
       this.getCommentData(contentId, 0);
@@ -149,8 +160,6 @@ export default{
           this.loading = false;
         }
         if (result.res === 0 && result.data) {
-          // this.comments = result.data.data;
-          console.log(result.data);
           this.comments.push(...result.data.data);
         }
       } catch (err) {
@@ -184,15 +193,33 @@ export default{
     },
     toRelated(relatedId) {
       // 跳转推荐页面
-      console.log('go!');
       this.$router.push({ path: `/essay/${relatedId}` });
     },
   },
+  // mounted() {
+  //   const el = document.querySelector('#essay-page');
+  //   const position = this.savedPosition[this.path];
+  //   if (position) {
+  //     setTimeout(() => {
+  //       el.scrollTop = position.top;
+  //     }, 100);
+  //   }
+  // },
 };
 </script>
 <style lang="scss">
  @import '../styles/rem.scss';
  #essay-page {
    padding-bottom: rem(135);
+   height: 100%;
+   overflow: scroll;
+ }
+ .appear-class {
+    opacity: 0;
+    transform: translateX(300px);
+    transition: all 5s;
+ }
+ .appear-active-class {
+  transition: all 5s;
  }
 </style>

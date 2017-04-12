@@ -1,21 +1,22 @@
 <template>
-  <div class="author-page">
-    <div class="header-bar">
-      <div class="header" ref='header'>
-        <div class="back" @click="back"></div>
-        <p class="title" ref='title'>{{author && author.user_name}}</p>
-      </div>
+  <div id="author-page">
+    <header-bar id="author-page-header" :leftOptions="leftOptions">
+      <span id="author-page-title">{{author && author.user_name}}</span>
+    </header-bar>
+    <div class="author-header">
       <main>
         <img class="avtor" v-lazy="author && author.web_url"></img>
         <p class="nickname"> {{author && author.user_name}}</p>
         <p class="signature">{{author && author.summary}}</p>
-        <button class="fork">关注</button>
-        <p class="fork-num">{{author && author.fans_total}}关注</p>
+        <button class="follow" :class="{'followed': isFollowed}" @click="follow">{{followBtnText}}</button>
+        <p class="follow-num">{{author && author.fans_total}}关注</p>
       </main>
     </div>
-    <ul v-infinite-scroll="loadMore"
-    infinite-scroll-disabled="loading"
-    infinite-scroll-distance="10">
+    <ul
+      v-infinite-scroll="loadMore"
+      infinite-scroll-disabled="loading"
+      infinite-scroll-distance="10"
+    >
       <li v-for="(item,index) in items">
         <card :key="item.id" :cardItem="item"></card>
       </li>
@@ -23,16 +24,21 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import Card from './Card';
+import HeaderBar from './HeaderBar';
 
 export default {
   components: {
     Card,
+    HeaderBar,
   },
   data() {
     return {
       items: [],
+      leftOptions: {
+        showBack: true,
+      },
     };
   },
   computed: {
@@ -40,6 +46,7 @@ export default {
       path: state => state.route.path,
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
+      followAuthors: state => state.storage.followAuthors,
     }),
     author() {
       const item = this.items[0];
@@ -47,18 +54,51 @@ export default {
         return item.author;
       }
     },
+    isFollowed() {
+      if (this.author) {
+        const index = this.followAuthors.indexOf(this.author.user_id);
+        if (index > -1) {
+          return true;
+        }
+      }
+      return false;
+    },
+    followBtnText() {
+      if (this.isFollowed) {
+        return '已关注';
+      }
+      return '关注';
+    },
   },
   methods: {
+    ...mapActions(['followAuthor']),
     scrollHandler(e) {
-      const scrollTop = e.target.body.scrollTop;
+      const header = document.querySelector('#author-page-header');
+      const title = document.querySelector('#author-page-title');
+      let boxShadow;
+      const scrollTop = e.target.scrollTop;
       let opacity;
       if (scrollTop <= 46) {
         opacity = scrollTop / 46;
+        boxShadow = 'none';
       } else {
         opacity = 1;
+        boxShadow = '0 0.00185rem 0.00093rem 0.00185rem whitesmoke';
       }
-      this.$refs.header.style.backgroundColor = `rgba(255,255,255,${opacity})`;
-      this.$refs.title.style.color = `rgba(0,0,0,${opacity * 0.8})`;
+      header.style.backgroundColor = `rgba(255,255,255,${opacity})`;
+      header.style.boxShadow = boxShadow;
+      title.style.color = `rgba(0,0,0,${opacity * 0.8})`;
+    },
+    follow() {
+      this.author.fans_total = Number(this.author.fans_total);
+      if (this.isFollowed) {
+        this.author.fans_total -= 1;
+      } else {
+        this.author.fans_total += 1;
+      }
+      this.followAuthor({
+        followUserId: this.author.user_id,
+      });
     },
     back() {
       this.$router.go(-1);
@@ -85,78 +125,45 @@ export default {
     },
   },
   mounted() {
-    const body = document.querySelector('body');
-    body.onscroll = this.scrollHandler;
+    const el = document.querySelector('#author-page');
+    el.addEventListener('scroll', this.scrollHandler);
     // 获取数据
     this.fetchData(this.$route.params.authorId, 0);
   },
   beforeRouteLeave: (to, from, next) => {
-    const body = document.querySelector('body');
-    body.onscroll = null;
+    const el = document.querySelector('#author-page');
+    el.removeEventListener('scroll', this.scrollHandler);
     next();
   },
 };
 </script>
 <style lang="scss" scoped>
 @import '../styles/rem.scss';
-.author-page {
-  margin-top: 46px;
+#author-page {
+  height: 100%;
+  overflow: scroll;
   background: #fbfbfb;
-  .header-bar {
-    background-color: white;
-    border-bottom: rem(30) solid #fbfbfb;
+  .header {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  .title {
+    color: transparent;
+  }
+  .author-header {
+    padding-top: 46px;
+    background-color:white;
+    margin-bottom: rem(30);
   }
   ul {
     list-style: none;
-  }
-  .header {
-    position: fixed;
-    top: 0;
-    height: 46px;
-    background: transparent;
-    color: black;
-    box-shadow: none;
-    .back {
-      float: left;
-      position: relative;
-      height: 46px;
-      width: 80px;
-      &:after {
-        content: '';
-        position: absolute;
-        top: 17px;
-        left: 15px;
-        height: 8px;
-        width: 8px;
-        border: 2px solid transparent;
-        border-left-color: gray;
-        border-bottom-color: gray;
-        transform: rotate(45deg);
-      }
-      &:before {
-        content: '';
-        position: absolute;
-        top: 22px;
-        left: 14px;
-        height: 2px;
-        width: 18px;
-        background: gray;
-      }
-    }
-    .title {
-      margin: 0 80px;
-      text-align: center;
-      line-height: 46px;
-      color: transparent;
-      font-size: 17px;
-    }
   }
   main {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    p, .fork, .fork-num  {
+    p, .follow, .follow-num  {
       text-align: center;
       color: black;
     }
@@ -174,15 +181,20 @@ export default {
       margin-top: rem(40);
       margin-bottom: rem(45);
     }
-    .fork {
+    .follow {
       font-size: 13px;
       height: rem(95);
       width: rem(225);
       line-height: rem(95);
       border-radius: 4px;
       border: 1px solid black;
+      background-color: white;
     }
-    .fork-num {
+    .followed {
+      color: white;
+      background-color: #555;
+    }
+    .follow-num {
       font-size: 12px;
       transform: scale(.77);
       color: gray;

@@ -5,6 +5,7 @@ const localStorage = window.localStorage;
 let praiseContents;
 let praiseComments;
 let collection;
+let followAuthors;
 
 function typeHelper(category) {
   let type;
@@ -36,6 +37,7 @@ function typeHelper(category) {
   praiseContents = JSON.parse(localStorage.getItem('contentIds')) || [];
   praiseComments = JSON.parse(localStorage.getItem('commnetIds')) || [];
   collection = JSON.parse(localStorage.getItem('collection')) || [];
+  followAuthors = JSON.parse(localStorage.getItem('authorIds')) || [];
 })();
 
 // 本地缓存数据
@@ -47,6 +49,8 @@ const storage = {
     praiseComments,
     // 收藏
     collection,
+    // 关注作者ID
+    followAuthors,
   },
   mutations: {
     pushPraiseContentId(state, payload) {
@@ -72,7 +76,6 @@ const storage = {
       }
     },
     pushCollection(state, payload) {
-      console.log('hire', payload);
       state.collection.push(payload.contentId);
       localStorage.setItem('collection', JSON.stringify(state.collection));
     },
@@ -81,6 +84,17 @@ const storage = {
       if (index > -1) {
         state.collection.splice(index, 1);
         localStorage.setItem('collection', JSON.stringify(state.collection));
+      }
+    },
+    pushAuthorId(state, payload) {
+      state.followAuthors.push(payload.authorId);
+      localStorage.setItem('authorId', JSON.stringify(state.followAuthors));
+    },
+    deleteAuthorId(state, payload) {
+      const index = state.followAuthors.indexOf(payload.authorId);
+      if (index > -1) {
+        state.followAuthors.splice(index, 1);
+        localStorage.setItem('authorId', JSON.stringify(state.followAuthors));
       }
     },
   },
@@ -173,6 +187,29 @@ const storage = {
           commit('pushCollection', updatePraiseCommnetPayload);
           Toast({
             message: '已收藏，可至个人中心收藏中查看',
+            position: 'bottom',
+            duration: 1200,
+          });
+        }
+      }
+    },
+    async followAuthor({ state, commit, rootState }, payload) {
+      const authorId = payload.followUserId;
+      const index = state.followAuthors.indexOf(authorId);
+      const mutationPayload = { authorId };
+      const form = { user_id: rootState.one.userId, jwt: rootState.one.jwt, follow_user_id: authorId };
+      if (index > -1) {
+        const resp = await axios.post(`/user/follow_cancel?${rootState.one.basicQueryString}`, form);
+        if (resp.data.res === 0) {
+          commit('deleteAuthorId', mutationPayload);
+        }
+      } else {
+        const resp = await axios.post(`/user/follow?${rootState.one.basicQueryString}`, form);
+        if (resp.data.res === 0) {
+          console.log(mutationPayload);
+          commit('pushAuthorId', mutationPayload);
+          Toast({
+            message: '已关注',
             position: 'bottom',
             duration: 1200,
           });

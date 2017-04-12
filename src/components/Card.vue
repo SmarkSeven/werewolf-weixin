@@ -150,7 +150,8 @@ export default{
       'updatePlayIndex',
       'updatePlayState',
       'updatePlayId',
-      'updateShowMusicPlayer']),
+      'updateShowMusicPlayer',
+      'updateDirection']),
     ...mapActions(['fetchAudioFromXiami', 'praise']),
     play() {
       // 当前音乐正在播放
@@ -211,6 +212,7 @@ export default{
       } else if (cardItem.category === '5') {
         path = 'movie';
       }
+      this.updateDirection({ direction: 'forward' });
       this.$router.push({ path: `/${path}/${cardItem.content_id}` });
     },
     like() {

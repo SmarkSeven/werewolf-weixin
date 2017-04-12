@@ -7,7 +7,7 @@
       <main>
         <div class="loadmore-wrapper" ref="wrapper">
          <loadmore class="loadmore" id="load-more" :autoFill="false" :bottom-method="loadBottom" :distanceIndex="1" ref="loadmore">
-           <transition-group name="list" mode="in-out" tag="div">
+           <transition-group name="list" tag="div">
             <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @on-img-click="showImg" ></card>
            </transition-group>
          </loadmore>
@@ -166,6 +166,7 @@ export default {
       'deletePraiseContentId',
       'updatePraisenum',
       'updateSavedPosition',
+      'updateDirection',
     ]),
     ...mapActions(['praise']),
     type(category) {
@@ -196,6 +197,7 @@ export default {
       this.$router.push('profile');
     },
     toSearch() {
+      this.updateDirection({ direction: 'forward' });
       this.$router.push('search');
     },
     share() {
@@ -292,10 +294,17 @@ export default {
         this.updateLastMovieId({ lastMovieId: this.movieList[listLen - 1].id });
       }
     },
+    updateWrapperHeight() {
+      const wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
+      this.$refs.wrapper.style.height = `${wrapperHeight}px`;
+    },
   },
   mounted() {
-    const wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
-    this.$refs.wrapper.style.height = `${wrapperHeight}px`;
+    this.updateWrapperHeight();
+    window.addEventListener('resize', this.updateWrapperHeight);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.updateWrapperHeight);
   },
 };
 </script>
@@ -321,6 +330,7 @@ html, body {
       padding-bottom: 50px;
 
     .loadmore-wrapper {
+      height: 100%;
       overflow: scroll;
       // -webkit-overflow-scrolling: auto;
     }
@@ -340,7 +350,7 @@ html, body {
 }
 // 过渡样式
 .list-enter-active, .list-leave-active {
-  transition: all .5s;
+  transition: all .5s ease;
 }
 .list-leave-active {
   opacity: 0;
