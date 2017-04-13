@@ -7,7 +7,7 @@
   </div>
   <div class="page-footer-right">
     <div class="page-footer-like-count"><span>{{praisenum}}</span>喜欢</div>
-    <div class="page-footer-comment-count" @click="cliclComentLabel"><span>{{commentnum}}</span>评论</div>
+    <div class="page-footer-comment-count" @click="clickCommentLabel"><span>{{commentnum}}</span>评论</div>
   </div>
 </div>
 </template>
@@ -27,6 +27,9 @@ export default {
   props: {
     data: {
       type: Object,
+    },
+    wrapper: {
+      type: String,
     },
   },
   computed: {
@@ -78,14 +81,12 @@ export default {
       this.praise(this.praiseData);
     },
     comment() {
-      this.$emit('on-comment');
+      this.$emit('comment');
     },
-    cliclComentLabel() {
-      const body = document.querySelector('body');
+    clickCommentLabel() {
+      const page = document.querySelector(`#${this.wrapper}`);
       const commentElem = document.querySelector('#comment-label');
-      body.scrollTop = commentElem.offsetTop;
-
-      // this.$emit('on-comment-label');
+      page.scrollTop = commentElem.offsetTop;
     },
   },
 };
@@ -140,7 +141,7 @@ export default {
     div {
       line-height: rem(130);
       -webkit-transform-origin-x: 0;
-      -webkit-transform: scale(0.84);
+      transform: scale(0.84);
       font-size: 12px;
       color:  hsla(0, 10%, 0%, .35);
     }

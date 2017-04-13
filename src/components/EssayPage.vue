@@ -7,15 +7,26 @@
       <related-label v-if="related.length > 0"></related-label>
       <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
       <comment-label></comment-label>
-      <comment-list :contentId="$route.params.id" type="essay"></comment-list>
-      <footer-bar :data="footerData"></footer-bar>
+      <comment-list :contentId="$route.params.id" type="essay" @clickComment="replay"></comment-list>
+      <transition name="one-fade-in">
+        <comment-form
+          v-if="showCommentForm"
+          :operation="commentOperation"
+          :cmtid="cmtid"
+          :itemid="itemid"
+          :username="commentUsername"
+          :content="commentContent"
+          type="essay"
+          @cancel="showCommentForm = false"
+        />
+      </transition>
+      <footer-bar :data="footerData" @comment="publish" wrapper="essay-page"></footer-bar>
     </div>
 </template>
 <script>
 import { mapState, mapMutations } from 'vuex';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
-import Comment from './Comment';
 import RelatedLabel from './RelatedLabel';
 import Related from './Related';
 import FooterBar from './FooterBar';
@@ -23,6 +34,7 @@ import HeaderBar from './HeaderBar';
 import EssayHeader from './EssayHeader';
 import Hp from './Hp';
 import CommentList from './CommentList';
+import CommentForm from './CommentForm';
 
 export default{
   components: {
@@ -31,11 +43,11 @@ export default{
     Hp,
     Author,
     CommentLabel,
-    Comment,
     RelatedLabel,
     Related,
     FooterBar,
     CommentList,
+    CommentForm,
   },
   data() {
     return {
@@ -51,10 +63,16 @@ export default{
         sharenum: 0,
         commentnum: 0,
       },
+      showCommentForm: false,
+      commentOperation: 'publish',
+      cmtid: 0,
+      commentUsername: null,
+      commentContent: null,
     };
   },
   computed: {
     ...mapState({
+      itemid: state => state.route.params.id,
       path: state => state.route.path,
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
@@ -195,31 +213,40 @@ export default{
       // 跳转推荐页面
       this.$router.push({ path: `/essay/${relatedId}` });
     },
+    replay(comment) {
+      this.showCommentForm = true;
+      this.commentOperation = 'replay';
+      this.cmtid = comment.id;
+      this.commentUsername = comment.username;
+      this.commentContent = comment.content;
+    },
+    publish() {
+      this.showCommentForm = true;
+      this.commentOperation = 'publish';
+      this.cmtid = 0;
+      this.commentUsername = null;
+      this.commentContent = null;
+    },
   },
-  // mounted() {
-  //   const el = document.querySelector('#essay-page');
-  //   const position = this.savedPosition[this.path];
-  //   if (position) {
-  //     setTimeout(() => {
-  //       el.scrollTop = position.top;
-  //     }, 100);
-  //   }
-  // },
+  watch: {
+    showCommentForm() {
+      const body = document.querySelector('body');
+      if (this.showCommentForm) {
+        body.style.overflow = 'hidden';
+      } else {
+        body.style.overflow = 'auto';
+      }
+    },
+  },
 };
 </script>
 <style lang="scss">
- @import '../styles/rem.scss';
+@import '../styles/animate.css';
+@import '../styles/rem.scss';
+@import  '../styles/transition.css';
  #essay-page {
    padding-bottom: rem(135);
    height: 100%;
    overflow: scroll;
- }
- .appear-class {
-    opacity: 0;
-    transform: translateX(300px);
-    transition: all 5s;
- }
- .appear-active-class {
-  transition: all 5s;
  }
 </style>

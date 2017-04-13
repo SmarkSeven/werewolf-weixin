@@ -7,22 +7,35 @@
     <related-label v-if="related.length > 0"></related-label>
     <related v-for="(item,index) in related" :related="item" tag="阅读" @on-clicke-item="toRelated" :key="item.id"></related>
     <comment-label></comment-label>
-    <comment v-for="(comment,index) in comments" :comment="comment" :itemId="itemId" type="movie" :key="comment.id"></comment>
+    <comment-list :contentId="itemid" type="movie" @clickComment="replay"></comment-list>
     <router-view></router-view>
-    <footer-bar :data="footerData"></footer-bar>
+    <transition name="one-fade-in">
+        <comment-form
+          v-if="showCommentForm"
+          :operation="commentOperation"
+          :cmtid="cmtid"
+          :itemid="itemid"
+          :username="commentUsername"
+          :content="commentContent"
+          type="movie"
+          @cancel="showCommentForm = false"
+        />
+    </transition>
+    <footer-bar :data="footerData" @comment="publish" wrapper="movie-page"></footer-bar>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
-import Comment from './Comment';
+import CommentForm from './CommentForm';
 import RelatedLabel from './RelatedLabel';
 import Related from './Related';
 import FooterBar from './FooterBar';
 import HeaderBar from './HeaderBar';
 import MovieHeader from './MovieHeader';
 import Hp from './Hp';
+import CommentList from './CommentList';
 
 export default{
   components: {
@@ -31,10 +44,11 @@ export default{
     Hp,
     Author,
     CommentLabel,
-    Comment,
     RelatedLabel,
+    CommentForm,
     Related,
     FooterBar,
+    CommentList,
   },
   data() {
     return {
@@ -43,6 +57,7 @@ export default{
       comments: [],
       related: [],
       show: false,
+      showCommentForm: false,
       update: {
         praisenum: 0,
         sharenum: 0,
@@ -51,11 +66,16 @@ export default{
       leftOptions: {
         showBack: true,
       },
+      commentOperation: 'publish',
+      cmtid: 0,
+      commentUsername: null,
+      commentContent: null,
     };
   },
   computed: {
     ...mapState({
       path: state => state.route.path,
+      itemid: state => state.route.params.id,
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
     }),
@@ -197,6 +217,20 @@ export default{
       // 跳转推荐页面
       console.log('go!');
       this.$router.push({ path: `/movie/${relatedId}` });
+    },
+    replay(comment) {
+      this.showCommentForm = true;
+      this.commentOperation = 'replay';
+      this.cmtid = comment.id;
+      this.commentUsername = comment.username;
+      this.commentContent = comment.content;
+    },
+    publish() {
+      this.showCommentForm = true;
+      this.commentOperation = 'publish';
+      this.cmtid = 0;
+      this.commentUsername = null;
+      this.commentContent = null;
     },
   },
 };

@@ -3,7 +3,7 @@
   <p class="author-label">作者</p>
   <div class="author-info" @click="onClick">
       <div class="author-avtor">
-        <img :src="author.web_url" alt="avtor">
+        <img v-lazy="author.web_url || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='" alt="avtor">
       </div>
       <div class="author-introduce">
         <p class="author-name">{{author.user_name}} <span class="web-name"> {{author.wb_name}}</span></p>

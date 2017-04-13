@@ -86,7 +86,8 @@ app.post('/user/follow', urlencodedParser, function (req, res) {
 });
 app.post('/user/follow_cancel', urlencodedParser, function (req, res) {
 });
-
+app.post('/comment/add', urlencodedParser, function (req, res) {
+});
 
 var isXiamiSong = /www.xiami.com\/song\/\d+/;
 var sidPattern = /(\d+)/;

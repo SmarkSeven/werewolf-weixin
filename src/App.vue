@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-   <music-player class="player" v-show="showMusicPlayer"></music-player>
+   <transition name="one-fade-top">
+     <music-player class="player" v-show="showMusicPlayer"></music-player>
+   </transition>
+   <transition name="one-fade-right">
+      <player-toggle v-show="showPlayerToggle"></player-toggle>
+   </transition>
     <transition
       :name="direction === 'forward' ? 'one-pop-in' : 'one-pop-out'"
     >
@@ -12,15 +17,23 @@
 <script>
 import { mapState } from 'vuex';
 import MusicPlayer from './components/MusicPlayer';
+import PlayerToggle from './components/PlayerToggle';
 
 export default {
   name: 'app',
+  data() {
+    return {
+      showPlayerToggle: false,
+    };
+  },
   components: {
     MusicPlayer,
+    PlayerToggle,
   },
   computed: {
     ...mapState({
       showMusicPlayer: state => state.one.showMusicPlayer,
+      playState: state => state.music.playState,
       direction: state => state.one.direction,
     }),
     enterActiveClass() {
@@ -28,6 +41,13 @@ export default {
         return 'animated fadeInRight';
       }
       return 'animated fadeInLeft';
+    },
+  },
+  watch: {
+    playState() {
+      if (this.playState === 'playing' && !this.showPlayerToggle) {
+        this.showPlayerToggle = true;
+      }
     },
   },
 };
@@ -53,43 +73,25 @@ body {
 .router-view {
   height: 100%;
 }
-.one-pop-out-enter-active,
-.one-pop-out-leave-active,
-.one-pop-in-enter-active,
-.one-pop-in-leave-active {
-  will-change: transform;
-  transition: all 500ms;
-  height: 100%;
-  // top: 46px;
-  position: absolute;
-  backface-visibility: hidden;
-  perspective: 1000;
-}
-.one-pop-out-enter {
-  opacity: 0;
-  transform: translate3d(-100%, 0, 0);
-}
-.one-pop-out-leave-active {
-  opacity: 0;
-  transform: translate3d(100%, 0, 0);
-}
-.one-pop-in-enter {
-  opacity: 0;
-  transform: translate3d(100%, 0, 0);
-}
-.one-pop-in-leave-active {
-  opacity: 0;
-  transform: translate3d(-100%, 0, 0);
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar
+{
+	width: 4px;
+	background-color: #F5F5F5;
 }
 
-.slide-fade-enter-active {
-  transition: all .4s ease;
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track
+{
+	background-color: white;
+
 }
-.slide-fade-leave-active {
-  transition: all .4s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-.slide-fade-enter, .slide-fade-leave-active {
-  transform: translateX(100px);
-  opacity: 0;
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb
+{
+  box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
 }
 </style>

@@ -5,7 +5,7 @@
     </header-bar>
     <div class="author-header">
       <main>
-        <img class="avtor" v-lazy="author && author.web_url"></img>
+        <img class="avtor" v-lazy="author && author.web_url || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='"></img>
         <p class="nickname"> {{author && author.user_name}}</p>
         <p class="signature">{{author && author.summary}}</p>
         <button class="follow" :class="{'followed': isFollowed}" @click="follow">{{followBtnText}}</button>
@@ -189,6 +189,7 @@ export default {
       border-radius: 4px;
       border: 1px solid black;
       background-color: white;
+      outline: none;
     }
     .followed {
       color: white;

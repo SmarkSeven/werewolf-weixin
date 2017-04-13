@@ -30,7 +30,10 @@ export default{
     },
   },
   mounted() {
-    this.$refs.input.focus();
+    const self = this;
+    setTimeout(() => {
+      self.$refs.input.focus();
+    }, 600);
   },
 };
 </script>

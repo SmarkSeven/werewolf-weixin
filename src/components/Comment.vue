@@ -72,6 +72,12 @@ export default {
     ...mapActions(['praiseComment']),
     commitComment() {
       console.log('回复评论');
+      const payload = {
+        id: this.comment.id,
+        username: `${this.comment.user.user_name} ：`,
+        content: this.comment.content,
+      };
+      this.$emit('clickComment', payload);
     },
     praise() { // TODO 点赞或取消
       if (this.isPraised) {

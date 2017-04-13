@@ -7,8 +7,20 @@
     <related-label v-if="related.length > 0"></related-label>
     <related v-for="(item,index) in related" :related="item" tag="音乐" @on-clicke-item="toRelated" :key="item.id"></related>
     <comment-label></comment-label>
-    <comment v-for="(comment,index) in comments" :comment="comment" :key="comment.id"></comment>
-    <footer-bar :data="footerData"></footer-bar>
+    <comment-list :contentId="itemid" type="music" @clickComment="replay"></comment-list>
+      <transition name="one-fade-in">
+        <comment-form
+          v-if="showCommentForm"
+          :operation="commentOperation"
+          :cmtid="cmtid"
+          :itemid="itemid"
+          :username="commentUsername"
+          :content="commentContent"
+          type="music"
+          @cancel="showCommentForm = false"
+        />
+      </transition>
+    <footer-bar :data="footerData" @comment="publish" wrapper="music-page"></footer-bar>
   </div>
 </template>
 <script>
@@ -16,7 +28,8 @@ import { mapState, mapMutations, mapActions } from 'vuex';
 // import { Toast } from 'mint-ui';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
-import Comment from './Comment';
+import CommentList from './CommentList';
+import CommentForm from './CommentForm';
 import RelatedLabel from './RelatedLabel';
 import Related from './Related';
 import FooterBar from './FooterBar';
@@ -31,7 +44,8 @@ export default{
     Hp,
     Author,
     CommentLabel,
-    Comment,
+    CommentForm,
+    CommentList,
     RelatedLabel,
     Related,
     FooterBar,
@@ -51,11 +65,17 @@ export default{
         sharenum: 0,
         commentnum: 0,
       },
+      showCommentForm: false,
+      commentOperation: 'publish',
+      cmtid: 0,
+      commentUsername: null,
+      commentContent: null,
     };
   },
   computed: {
     ...mapState({
       path: state => state.route.path,
+      itemid: state => state.route.params.id,
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
       musicId: state => state.music.musicId,
@@ -220,6 +240,20 @@ export default{
       // 跳转推荐页面
       console.log('go!');
       this.$router.push({ path: `/music/${relatedId}` });
+    },
+    replay(comment) {
+      this.showCommentForm = true;
+      this.commentOperation = 'replay';
+      this.cmtid = comment.id;
+      this.commentUsername = comment.username;
+      this.commentContent = comment.content;
+    },
+    publish() {
+      this.showCommentForm = true;
+      this.commentOperation = 'publish';
+      this.cmtid = 0;
+      this.commentUsername = null;
+      this.commentContent = null;
     },
   },
 };

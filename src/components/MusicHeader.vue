@@ -1,7 +1,7 @@
 <template>
   <div class="music-header" id='musicheader'>
     <div class="music-header-box" @click="showDetail">
-      <img class="music-header-img" :class="{'rotate': isPlaying}"  src='data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='  alt="allbum-imgs" @click="show" ref="img">
+      <img class="music-header-img" :class="{'rotate': isPlaying}"  src='data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='  alt="allbum-imgs" ref="img">
       <img class="muisc-header-xiami" src="../assets/xiami_logo.png" alt="xiami-logo">
       <div :class="{'music-header-play-btn': !isPlaying ,'music-header-pause-btn': isPlaying}" @click.stop="play"></div>
     </div>
@@ -46,9 +46,6 @@ export default {
     },
     play() {
       this.$emit('on-click-play');
-    },
-    show() {
-      this.updateShowMusicPlayer({ show: true });
     },
   },
 };

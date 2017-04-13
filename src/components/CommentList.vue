@@ -3,7 +3,7 @@
     infinite-scroll-disabled="loading"
     infinite-scroll-distance="10">
     <li v-for="(comment,index) in comments">
-      <comment :comment="comment" :type="type" :key="comment.id"></comment>
+      <comment :comment="comment" :type="type" :key="comment.id" @clickComment="replay"></comment>
     </li>
   </ul>
 </template>
@@ -31,7 +31,7 @@ export default {
   methods: {
     async getCommentData(contentId, commentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/essay/${contentId}/${commentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/${this.type}/${contentId}/${commentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (commentId > 0) {
           this.loading = false;
@@ -54,6 +54,9 @@ export default {
       } else {
         this.loading = false;
       }
+    },
+    replay(payload) {
+      this.$emit('clickComment', payload);
     },
   },
   created() {
