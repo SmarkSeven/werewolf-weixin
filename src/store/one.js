@@ -1,7 +1,7 @@
 const one = {
   state: {
     host: 'http://v3.wufazhuce.com:8000/api',
-    basicQueryString: 'user_id=7878484&channel=pp&version=4.0.7&uuid=00000000-41eb-998f-dab4-6c1045072748&platform=android',
+    basicQueryString: 'user_id=5105554&channel=pp&version=4.0.7&uuid=00000000-41eb-998f-dab4-6c1045072748&platform=android',
     jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE0OTA1MjcwMjMsInVzZXJpZCI6IjUxMDU1NTQifQ.iHN9EPkMHV2u1BzsfbMbxr5NEb87Icf-P2Eu4AQMHLA',
     userId: 7878484,
     weather: null,

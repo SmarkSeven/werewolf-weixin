@@ -1,8 +1,8 @@
 <template>
   <div id="home-container">
       <header-bar slot="header" :title="title">
-        <img src="../assets/individual_center.png" alt="profile" slot="left" @click="toProfile">
-        <div slot="right" @click="toSearch">Search</div>
+        <img src="../assets/individual_center.png" slot="left" @click="toProfile" alt="profile">
+        <div slot="right" @click="toSearch" alt="search" class="search-btn"></div>
       </header-bar>
       <main>
         <div class="loadmore-wrapper" ref="wrapper">
@@ -194,6 +194,7 @@ export default {
       setTimeout(this.$refs.loadmore.onBottomLoaded, 1000);
     },
     toProfile() {
+      this.updateDirection({ direction: 'back' });
       this.$router.push('profile');
     },
     toSearch() {
@@ -323,12 +324,19 @@ html, body {
     height: 46px;
     width: 46px;
    }
+   .search-btn {
+    height: 46px;
+    width: 27px;
+    background-image: url('../assets/search.png');
+    background-position: center center;
+    background-size: 27px 27px;
+    background-repeat: no-repeat;
+   }
   }
   main {
       height: 100%;
       padding-top: 46px;
       padding-bottom: 50px;
-
     .loadmore-wrapper {
       height: 100%;
       overflow: scroll;

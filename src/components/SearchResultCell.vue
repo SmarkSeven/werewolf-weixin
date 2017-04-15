@@ -1,7 +1,7 @@
 <template>
   <div class="search-result-cell" @click="onClick">
     <img v-if="imgUrl" v-lazy="imgUrl" alt="icon" class="icon" :class="{'circle': type === 'author'}">
-    <div class="box">
+    <div class="box" :class="{'bigger': !imgUrl}">
       <p class="sub"><span>{{sub}}</span></p>
       <p class="content">{{content}}</p>
     </div>
@@ -56,7 +56,7 @@ export default{
     display: inline-block;
     height: 100%;
     p {
-      width: rem(680);
+      width: rem(650);
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -81,5 +81,9 @@ export default{
     }
 
   }
-
+  .bigger {
+    p{
+      width: rem(770);
+    }
+  }
 </style>

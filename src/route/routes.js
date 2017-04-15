@@ -8,7 +8,7 @@ import EssayPage from '../components/EssayPage';
 import MusicPage from '../components/MusicPage';
 import MoviePage from '../components/MoviePage';
 import QuestionPage from '../components/QuestionPage';
-import CommentForm from '../components/CommentForm';
+import Profile from '../components/Profile';
 import AuhtorPage from '../components/AuthorPage.vue';
 import SearchResultPage from '../components/SearchResultPage';
 import VideoPage from '../components/VideoPage';
@@ -32,7 +32,7 @@ const routes = [
   },
   {
     path: '/profile',
-    component: CommentForm,
+    component: Profile,
   },
   {
     path: '/search',
