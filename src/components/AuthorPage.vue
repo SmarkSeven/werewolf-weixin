@@ -141,6 +141,7 @@ export default {
 @import '../styles/rem.scss';
 #author-page {
   height: 100%;
+  width: 100%;
   overflow: scroll;
   background: #fbfbfb;
   .header {

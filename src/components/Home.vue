@@ -6,9 +6,11 @@
       </header-bar>
       <main>
         <div class="loadmore-wrapper" ref="wrapper">
-         <loadmore class="loadmore" id="load-more" :autoFill="false" :bottom-method="loadBottom" :distanceIndex="1" ref="loadmore">
-           <transition-group name="list" tag="div">
-            <card v-for="(item,index) in data" :key="item.id" :cardItem="item" @click-share="share" @on-img-click="showImg" ></card>
+         <loadmore class="loadmore" id="load-more" :bottom-method="loadBottom" :autoFill="false" ref="loadmore">
+           <transition-group name="list" tag="ul">
+            <li v-for="(item,index) in data" :key="item.id">
+              <card :cardItem="item" @click-share="share" @on-img-click="showImg" :key="item.id"></card>
+            </li>
            </transition-group>
          </loadmore>
         </div>
@@ -334,16 +336,18 @@ html, body {
    }
   }
   main {
+    height: 100%;
+    .loadmore-wrapper {
       height: 100%;
       padding-top: 46px;
       padding-bottom: 50px;
-    .loadmore-wrapper {
-      height: 100%;
       overflow: scroll;
-      // -webkit-overflow-scrolling: auto;
+      -webkit-overflow-scrolling: auto;
     }
     .loadmore {
-      -webkit-overflow-scrolling: auto;
+      ul {
+        list-style: none;
+      }
     }
   }
 }

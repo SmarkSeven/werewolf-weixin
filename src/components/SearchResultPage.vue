@@ -25,6 +25,7 @@
         infinite-scroll-distance="10"
         infinite-scroll-immediate-check="false">
         <mt-tab-container-item v-for="(tab,index) in tabs" :key="index" :id="tab">
+          <transition name="one-pop-in" mode="out-in">
             <div v-if="selected === 'hp'">
               <transition-group name="list" tag="div">
                 <cell v-for="item in data"
@@ -55,8 +56,9 @@
                   :sub="item.title"
                   :content="item.author.user_name"
                   :id="item.id"
+                  :musicId="item.music_id"
                   type="music"
-                  :key="item.id">
+                  :key="item.music_id">
                 </cell>
               </transition-group>
             </div>
@@ -86,6 +88,7 @@
             <div v-if="data.length === 0 && loaded" class="no-search-result">
               <x-icon type="social-buffer-outline" size="40"></x-icon>
             </div>
+          </transition>
         </mt-tab-container-item>
       </mt-tab-container>
     </main>
@@ -259,6 +262,7 @@ export default{
     },
   },
   mounted() {
+    this.$refs.input.value = this.params.key;
     this.setContainerHieght();
     window.addEventListener('resize', this.setContainerHieght);
   },
@@ -269,6 +273,7 @@ export default{
 </script>
 <style lang="scss" scoped>
 @import '../styles/rem.scss';
+@import '../styles/transition.css';
 #search-reslut-page {
   height: 100%;
   width: 100%;
@@ -327,13 +332,5 @@ main {
   height: rem(1200);
   justify-content: center;
   align-items: center;
-}
-// 过渡样式
-.list-enter-active, .list-leave-active {
-  transition: all 1s;
-}
-.list-enter, .list-leave-active {
-  opacity: 0;
-  transform: translateY(50px);
 }
 </style>

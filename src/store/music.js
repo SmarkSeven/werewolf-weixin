@@ -5,31 +5,31 @@ const music = {
     musicId: 0,
     title: undefined, // 文章标题
     author: undefined,  // 文章作者
-    musicName: undefined, // 当前展示项的音乐名
-    audioAuthor: undefined, // 当前展示项的音乐作者
-    audioAlbum: undefined, // 专辑
+    musicTitle: undefined, // 音乐名
+    singer: undefined, // 演唱者
+    album: undefined, // 专辑
     playList: [], // 音乐播放列表
     playIndex: -1, // 当前播放项下标
     playState: 'pause',  // 播放状态 pause | playing
     playId: '', // 正在播放的音乐ID
   },
   mutations: {
-    updateMusicTitle(state, payload) {
-      state.title = payload.title;
+    updateStoryTitle(state, payload) {
+      state.storyTitle = payload.storyTitle;
     },
     updateMusicId(state, payload) {
       state.musicId = payload.musicId;
     },
-    updateMusicName(state, payload) {
-      state.musicName = payload.musicName;
+    updateMusicTitle(state, payload) {
+      state.musicTitle = payload.musicTitle;
     },
-    updateAudioAuthor(state, payload) {
-      state.audioAuthor = payload.audioAuthor;
+    updateSinger(state, payload) {
+      state.singer = payload.singer;
     },
-    updateAudioAlbum(state, payload) {
-      state.audioAlbum = payload.audioAlbum;
+    updateAlbum(state, payload) {
+      state.album = payload.album;
     },
-    updateWordsAuthor(state, payload) {
+    updateStoryAuthor(state, payload) {
       state.author = payload.author;
     },
     updatePlayList(state, payload) {
@@ -53,9 +53,9 @@ const music = {
         if (xhr.readyState === 4 && xhr.status === 200) {
           const res = JSON.parse(xhr.responseText);
           const audio = {
-            musicName: payload.musicName,
+            musicTitle: payload.musicTitle,
             musicId: payload.musicId,
-            musicAuthor: payload.musicAuthor,
+            singer: payload.singer,
             audioUrl: res.data.url,
           };
           commit('updatePlayList', { playList: [audio] });

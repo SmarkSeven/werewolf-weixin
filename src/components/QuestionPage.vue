@@ -59,11 +59,6 @@ export default{
       leftOptions: {
         showBack: true,
       },
-      // update: {
-      //   praisenum: '0',
-      //   sharenum: '0',
-      //   commentnum: '0',
-      // },
       showCommentForm: false,
       commentOperation: 'publish',
       cmtid: 0,
@@ -110,17 +105,11 @@ export default{
       return this.question && {
         id: this.question.questionId,
         contentId: this.question.question_id,
-        category: this.question.content_type,
+        category: 3,
         praisenum: this.question.praisenum,
         commentnum: this.question.commentnum,
       };
     },
-  },
-  created() {
-    const self = this;
-    setTimeout(() => {
-      self.show = true;
-    }, 200);
   },
   beforeRouteEnter(to, from, next) {
     // 文章内容ID
@@ -140,7 +129,6 @@ export default{
       this.getQuestion(contentId);
       this.getCommentData(contentId);
       this.getRelated(contentId);
-      // this.getUpdate(contentId);
     },
     async getQuestion(contentId) {
       try {
@@ -175,18 +163,6 @@ export default{
         console.log(err);
       }
     },
-    // async getUpdate(contentId) {
-    //   const dateString = new Date().toLocaleString().replace(/[\u4e00-\u9fa5]/g, '').replace(/\//g, '-');
-    //   try {
-    //     const resp = await this.$http.get(`${this.host}/question/update/${contentId}/${dateString}?${this.basicQueryString}`);
-    //     const result = resp.data;
-    //     if (result.res === 0 && result.data) {
-    //       this.update = result.data;
-    //     }
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // },
     toAuthor() {
     },
     toRelated(relatedId) {
@@ -209,12 +185,21 @@ export default{
       this.commentContent = null;
     },
   },
+  mounted() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
+  },
 };
 </script>
 <style lang="scss">
  @import '../styles/rem.scss';
  #question-page {
    padding-bottom: rem(135);
+   height: 100%;
+   width: 100%;
+   overflow: scroll;
    .divide-line {
      margin: 0 rem(60);
      margin-top: rem(-10);

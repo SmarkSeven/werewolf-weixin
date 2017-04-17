@@ -2,7 +2,7 @@
   <div id="music-page" v-show="show">
     <header-bar :leftOptions="leftOptions" title="一个音乐"></header-bar>
     <music-header :data="headerData" @on-click-play="play"></music-header>
-    <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
+    <hp :content="content" :hpAuthorIntroduce="chargeEdt" :copyright="copyright"></hp>
     <author v-for="(author, index) in authors" :author="author" @on-click-item="toAuthor" :key="author.user_id"></author>
     <related-label v-if="related.length > 0"></related-label>
     <related v-for="(item,index) in related" :related="item" tag="音乐" @on-clicke-item="toRelated" :key="item.id"></related>
@@ -25,7 +25,6 @@
 </template>
 <script>
 import { mapState, mapMutations, mapActions } from 'vuex';
-// import { Toast } from 'mint-ui';
 import Author from './Author';
 import CommentLabel from './CommentLabel';
 import CommentList from './CommentList';
@@ -52,11 +51,12 @@ export default{
   },
   data() {
     return {
+      detail: null,
       music: null,
-      authors: [],
+      authors: null,
       comments: [],
       related: [],
-      show: true,
+      show: false,
       leftOptions: {
         showBack: true,
       },
@@ -75,15 +75,16 @@ export default{
   computed: {
     ...mapState({
       path: state => state.route.path,
+      params: state => state.route.params,
       itemid: state => state.route.params.id,
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
-      musicId: state => state.music.musicId,
-      author: state => state.music.author,
+      // musicId: state => state.music.musicId,
+      // author: state => state.music.author,
       playId: state => state.music.playId,
       playState: state => state.music.playState,
-      audioAuthor: state => state.music.audioAuthor,
-      musicName: state => state.music.musicName,
+      // audioAuthor: state => state.music.audioAuthor,
+      // musicName: state => state.music.musicName,
     }),
     title() {
       return this.music && this.music.title;
@@ -91,57 +92,64 @@ export default{
     cover() {
       return this.music && this.music.cover;
     },
-    authors() {
-      return this.authors;
+    album() {
+      return this.detail && this.detail.album;
+    },
+    singer() {
+      const regexp = /(演唱者：).*(?=\r\n作词)/;
+      return this.detail && this.detail.info.match(regexp, '')[0].replace('演唱者：', '');
+    },
+    authorName() {
+      if (this.authors && this.authors.length) {
+        return `文╱${this.authors[0].user_name}`;
+      }
     },
     content() {
       return this.music && this.music.story.replace(/style="height:\d+px; width:\d+px"/g, '');
     },
-    authorName() {
-      return `文╱${this.music.hp_author}`;
+    // authorName() {
+    //   return `文╱${this.music.hp_author}`;
+    // },
+    chargeEdt() {
+      return this.detail && this.detail.charge_edt;
     },
     copyright() {
-      return '责任编辑：十三妹 shisanmei@wufazhuce.com';
-    },
-    hpAuthorIntroduce() {
-      return this.essay && `${this.msuic.hp_author_introduce}${this.music.editor_email}`;
+      return this.detail && this.detail.copyright; // '责任编辑：十三妹 shisanmei@wufazhuce.com';
     },
     // 当前音乐是否正在播放
     isPlaying() {
-      return String(this.musicId) === this.playId && this.playState === 'playing';
+      return String(this.params.musicId) === this.playId && this.playState === 'playing';
     },
     headerData() {
-      return this.music && {
-        cover: this.music.cover,
+      return this.detail && {
+        cover: this.detail.cover,
         playing: this.isPlaying,
+        musicTitle: this.detail.title,
+        storyTitle: this.detail.story_title,
+        author: this.authorName,
+        album: this.album,
+        singer: this.singer,
       };
     },
     footerData() {
       return this.music && this.update && {
         contentId: this.music.id,
-        category: this.music.content_type,
+        category: 4,
         praisenum: this.update.praisenum,
         commentnum: this.update.commentnum,
       };
     },
   },
-  created() {
-    const self = this;
-    setTimeout(() => {
-      self.show = true;
-    }, 200);
-  },
   beforeRouteEnter(to, from, next) {
-    // 音乐内容ID
-    const contentId = to.params.id;
     next((vm) => {
       // 获取music数据
-      vm.getData(contentId, vm.musicId);
+      vm.getData(vm.params.id, vm.params.musicId);
     });
   },
   beforeRouteUpdate(to, from, next) {
-    const contentId = to.params.id;
-    this.getData(contentId);
+    const contentId = to.params.musicId;
+    const musicId = to.params.id;
+    this.getData(contentId, musicId);
     next();
   },
   methods: {
@@ -153,7 +161,7 @@ export default{
     ...mapActions(['fetchAudioFromXiami']),
     getData(contentId, musicId) {
       this.getMusicData(musicId);
-      this.getAuthorList(contentId);
+      this.getMusicDetail(contentId);
       this.getCommentData(contentId);
       this.getRelated(contentId);
       this.getUpdate(contentId);
@@ -169,12 +177,13 @@ export default{
         console.log(err);
       }
     },
-    async getAuthorList(contentId) {
+    async getMusicDetail(id) {
       try {
-        const resp = await this.$http.get(`${this.host}/author/list?content_id=${contentId}&category=4${this.basicQueryString}`);
+        const resp = await this.$http.get(`${this.host}/music/detail/${id}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
-          this.authors = result.data;
+          this.detail = result.data;
+          this.authors = this.detail.author_list;
         }
       } catch (err) {
         console.log(err);
@@ -217,29 +226,26 @@ export default{
     play() {
       // 正在播放当前音乐则暂停
       if (this.music.music_id === this.playId && this.playState === 'playing') {
-        console.log('正在暂停');
         this.updatePlayState({ playState: 'pause' });
         return;
       }
       // 当前音乐处于暂停状态则播放
       if (this.music.music_id === this.playId && this.playState === 'pause') {
-        console.log('即将播放');
         this.updatePlayState({ playState: 'playing' });
         return;
       }
       const playload = {
-        musicId: String(this.musicId),
-        musicAuthor: this.music.audioAuthor,
-        musicName: this.musicName,
+        musicId: String(this.params.musicId),
+        singer: this.singer,
+        musicTitle: this.title,
       };
       this.fetchAudioFromXiami(playload);
     },
     toAuthor() {
     },
-    toRelated(relatedId) {
+    toRelated(relatedId, musicId) {
       // 跳转推荐页面
-      console.log('go!');
-      this.$router.push({ path: `/music/${relatedId}` });
+      this.$router.push({ path: `/music/${relatedId}/${musicId}` });
     },
     replay(comment) {
       this.showCommentForm = true;
@@ -256,6 +262,12 @@ export default{
       this.commentContent = null;
     },
   },
+  mounted() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
+  },
 };
 </script>
 <style lang="scss">
@@ -263,6 +275,7 @@ export default{
 #music-page {
     padding-bottom: rem(135);
     height: 100%;
+    width: 100%;
     overflow: scroll;
 }
 </style>

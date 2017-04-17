@@ -13,6 +13,7 @@ export default {
   @import '../styles/rem.scss';
   .essay-header {
     padding: 0 rem(60);
+    width: 100%;
     .essay-title {
       padding-bottom: rem(50);
       padding-top: rem(200);

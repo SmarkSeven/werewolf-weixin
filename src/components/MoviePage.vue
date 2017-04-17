@@ -1,5 +1,5 @@
 <template>
-  <div id='movie-page' :class="{'show': show, 'hidden': !show}">
+  <div id='movie-page' v-if="show">
     <header-bar :leftOptions="leftOptions" title="一个影视"></header-bar>
     <movie-header :title="title" :authorName="authorName" :photos="photos"></movie-header>
     <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
@@ -119,18 +119,12 @@ export default{
       return this.movie && this.update && {
         id: this.movie.id,
         contentId: this.movie.movie_id,
-        category: this.movie.content_type,
+        category: 5,
         movieStoryId: this.movie.id,
         praisenum: this.movie.praisenum,
         commentnum: this.update.commentnum,
       };
     },
-  },
-  created() {
-    const self = this;
-    setTimeout(() => {
-      self.show = true;
-    }, 200);
   },
   beforeRouteEnter(to, from, next) {
     // 文章内容ID
@@ -233,6 +227,12 @@ export default{
       this.commentContent = null;
     },
   },
+  mounted() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
+  },
 };
 </script>
 <style lang="scss">
@@ -241,6 +241,7 @@ export default{
 #movie-page {
     padding-bottom: rem(135);
     height: 100%;
+    width: 100%;
     overflow: scroll;
 }
 .hidden{

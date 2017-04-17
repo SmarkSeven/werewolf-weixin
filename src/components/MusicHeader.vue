@@ -5,10 +5,10 @@
       <img class="muisc-header-xiami" src="../assets/xiami_logo.png" alt="xiami-logo">
       <div :class="{'music-header-play-btn': !isPlaying ,'music-header-pause-btn': isPlaying}" @click.stop="play"></div>
     </div>
-    <p class="music-header-subtitle">· {{musicName}} ·</p>
-    <p class="music-header-audioAlbum">{{audioAuthor}} | {{audioAlbum}}</p>
-    <h1 class="music-header-title">{{title}}</h1>
-    <p class="music-header-author">{{author}}</p>
+    <p class="music-header-subtitle">· {{data && data.musicTitle}} ·</p>
+    <p class="music-header-audioAlbum">{{data && data.singer}} | {{data && data.album}}</p>
+    <h1 class="music-header-title">{{data && data.storyTitle}}</h1>
+    <p class="music-header-author">{{data && data.author}}</p>
   </div>
 </template>
 <script>
@@ -21,11 +21,11 @@ export default {
   },
   computed: {
     ...mapState({
-      title: state => state.music.title,
-      author: state => state.music.author,
-      musicName: state => state.music.musicName,
+      // title: state => state.music.title,
+      // author: state => state.music.author,
+      // musicName: state => state.music.musicName,
       audioAuthor: state => state.music.audioAuthor,
-      audioAlbum: state => state.music.audioAlbum,
+      // audioAlbum: state => state.music.audioAlbum,
     }),
     cover() {
       return this.data && this.data.cover;
@@ -129,13 +129,11 @@ img[src=""] {
     text-align: center;
     color: rgb(196, 196, 196);
   }
- .music-header-subtitle {
-
-  }
  .music-header-title {
       padding: 0 rem(60);
       padding-bottom: rem(10);
       padding-top: rem(75);
+      text-align: center;
       font-weight: normal;
       font-size: 22px;
       line-height: 1.4;

@@ -12,6 +12,7 @@ import Profile from '../components/Profile';
 import AuhtorPage from '../components/AuthorPage.vue';
 import SearchResultPage from '../components/SearchResultPage';
 import VideoPage from '../components/VideoPage';
+import HpPage from '../components/HpPage.vue';
 
 const routes = [
   {
@@ -55,11 +56,15 @@ const routes = [
     component: B,
   },
   {
+    path: '/hp/:id',
+    component: HpPage,
+  },
+  {
     path: '/essay/:id',
     component: EssayPage,
   },
   {
-    path: '/music/:id',
+    path: '/music/:id/:musicId',
     component: MusicPage,
   },
   {

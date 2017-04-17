@@ -36,7 +36,7 @@ export default {
     ...mapState({
       praiseContents: state => state.storage.praiseContents,
       collection: state => state.storage.collection,
-      currentItemCategory: state => state.one.currentItemCategory,
+      // currentItemCategory: state => state.one.currentItemCategory,
     }),
     praisenum() {
       return this.data && (this.data.praisenum + this.increment);
@@ -61,7 +61,7 @@ export default {
     praiseData() {
       return {
         id: Number(this.data.id),
-        category: Number(this.currentItemCategory),
+        category: Number(this.data.category),
         contentId: Number(this.data.contentId),
         storyId: Number(this.data.movieStoryId),
       };
@@ -72,6 +72,7 @@ export default {
     onCollectClick() {
       this.collect(this.praiseData);
     },
+    // 点赞
     like() {
       if (this.isPraised) {
         this.increment -= 1;
@@ -80,9 +81,11 @@ export default {
       }
       this.praise(this.praiseData);
     },
+    // 评论
     comment() {
       this.$emit('comment');
     },
+    // 页内跳转
     clickCommentLabel() {
       const page = document.querySelector(`#${this.wrapper}`);
       const commentElem = document.querySelector('#comment-label');

@@ -1,5 +1,5 @@
 <template>
-    <div id='essay-page' v-show="show">
+    <div id='essay-page' v-if="show">
       <header-bar :leftOptions="leftOptions" title="一个阅读"></header-bar>
       <essay-header :title="title" :authorName="author"></essay-header>
       <hp :content="content" :hpAuthorIntroduce="hpAuthorIntroduce" :copyright="copyright"></hp>
@@ -54,7 +54,7 @@ export default{
       essay: null,
       comments: [],
       related: [],
-      show: true,
+      show: false,
       leftOptions: {
         showBack: true,
       },
@@ -76,7 +76,7 @@ export default{
       path: state => state.route.path,
       host: state => state.one.host,
       basicQueryString: state => state.one.basicQueryString,
-      authorName: state => state.reading.authorName,
+      // authorName: state => state.reading.authorName,
       savedPosition: state => state.one.savedPosition,
     }),
     title() {
@@ -90,7 +90,7 @@ export default{
     },
     author() {
       if (this.essay && this.essay.tag_list.length === 0) {
-        return `文╱${this.authorName}`;
+        return `文╱${this.essay.author[0].user_name}`;
       }
       return this.essay && `文╱${this.essay.hp_author}`;
     },
@@ -103,18 +103,18 @@ export default{
     footerData() {
       return this.essay && this.update && {
         contentId: this.essay.content_id,
-        category: this.essay.content_type,
+        category: 1,
         praisenum: this.update.praisenum,
         commentnum: this.update.commentnum,
       };
     },
   },
-  created() {
-    const self = this;
-    setTimeout(() => {
-      self.show = true;
-    }, 200);
-  },
+  // created() {
+  //   const self = this;
+  //   setTimeout(() => {
+  //     self.show = true;
+  //   }, 200);
+  // },
   beforeRouteEnter(to, from, next) {
     // 文章内容ID
     const contentId = to.params.id;
@@ -237,6 +237,12 @@ export default{
         body.style.overflow = 'auto';
       }
     },
+  },
+  mounted() {
+    const self = this;
+    setTimeout(() => {
+      self.show = true;
+    }, 200);
   },
 };
 </script>

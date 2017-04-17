@@ -14,6 +14,7 @@ import vuex from './store/vuex';
 import one from './store/one';
 import music from './store/music';
 import reading from './store/reading';
+import Hp from './store/hp';
 import user from './store/user';
 import App from './App';
 import routes from './route/routes';
@@ -31,6 +32,7 @@ const store = new Vuex.Store({
     one,
     storage,
     user,
+    Hp,
     music,
     question,
     reading,

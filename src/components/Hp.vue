@@ -14,6 +14,7 @@ export default {
 @import '../styles/rem.scss';
 .hp {
     padding: 0 rem(60);
+    width: 100%;
     .ph-content {
       img {
         display: inline-block;

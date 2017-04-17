@@ -54,14 +54,14 @@ export default{
     // 歌曲名
     musicName() {
       if (this.playIndex > -1 && this.playList.length > 0) {
-        return this.playList[this.playIndex].musicName;
+        return this.playList[this.playIndex].musicTitle;
       }
       return ' ';
     },
     // 歌唱者
     audioAuthor() {
       if (this.playIndex > -1 && this.playList.length > 0) {
-        return this.playList[this.playIndex].musicAuthor;
+        return this.playList[this.playIndex].singer;
       }
       return ' ';
     },

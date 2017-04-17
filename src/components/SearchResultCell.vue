@@ -9,17 +9,29 @@
   </div>
 </template>
 <script>
+import { mapMutations } from 'vuex';
+
 export default{
   data() {
     return {
       src: 'http://image.wufazhuce.com/Fq2rAhpbB-4oWN0iLLheD5sDALnA',
     };
   },
-  props: ['imgUrl', 'sub', 'content', 'type', 'id'],
+  props: ['imgUrl', 'sub', 'content', 'type', 'id', 'musicId'],
   methods: {
+    ...mapMutations([
+      'updateMusicId',
+      'updateMusicName',
+      'updateAudioAuthor',
+      'updateMusicTitle',
+      'updateAudioAlbum',
+    ]),
     onClick() {
-      console.log(this.type, this.id);
-      this.$router.push({ path: `/${this.type}/${this.id}` });
+      let path = `/${this.type}/${this.id}`;
+      if (this.type === 'music') {
+        path = `/${this.type}/${this.id}/${this.musicId}`;
+      }
+      this.$router.push({ path });
     },
   },
 };
@@ -30,7 +42,11 @@ export default{
     position: relative;
     // height: rem(169);
     padding: rem(30) rem(60) rem(15) 0;
-    border-bottom: rem(1) solid #e8e8e8;
+    // border-bottom: rem(1) solid #e8e8e8;
+    background-image: linear-gradient(left, #f8f8f8, #f8f8f8);
+    background-position: 0 100%;
+    background-size: 100% rem(4);
+    background-repeat: no-repeat;
   }
   .icon {
     height: rem(122);

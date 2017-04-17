@@ -42,6 +42,8 @@ module.exports = {
     'no-param-reassign': 0,
     'consistent-return': 0,
     'max-len': 0,
-    'no-console': 0
+    'no-console': 0,
+    'no-invalid-regexp': 0,
+    'no-useless-escape': 0
   }
 }
