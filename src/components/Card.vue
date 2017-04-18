@@ -304,7 +304,6 @@ html {
     }
     .like-num {
       margin-top: rem(5);
-      margin-right: rem(-16);
     }
     .like-btn {
       margin-right: rem(60);

@@ -65,7 +65,7 @@ const music = {
       // 必须使用同步请求false
       // 否则在手机端Chrome中得到一下错误
       // Uncaught (in promise) DOMException: play() can only be initiated by a user gesture.
-      xhr.open('GET', `/xiami/song?id=${payload.musicId}`, false);
+      xhr.open('GET', `/xia_mi/song?id=${payload.musicId}`, false);
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.send(null);
     },

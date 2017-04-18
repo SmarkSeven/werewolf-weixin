@@ -62,33 +62,9 @@ var getProxyArr = [
 getProxyArr.forEach(function (context) {
   var  options = { target: 'http://v3.wufazhuce.com:8000/api' }
   app.use(proxyMiddleware(options.filter || context, options))
-  // app.get(context, function (req, res) {});
 })
-// app.post('/praise/add', urlencodedParser, function (req, res) {
-// });
-// app.post('/movie/praisestory', urlencodedParser, function (req, res) {
-// });
-// app.post('/comment/praise', urlencodedParser, function (req, res) {
-// });
-// app.post('/comment/unpraise', urlencodedParser, function (req, res) {
-// });
-// app.post('/collection/add', urlencodedParser, function (req, res) {
-// });
-// app.post('/collection/del', urlencodedParser, function (req, res) {
-// });
-// app.post('/user/follow', urlencodedParser, function (req, res) {
-// });
-// app.post('/user/follow_cancel', urlencodedParser, function (req, res) {
-// });
-// app.post('/comment/add', urlencodedParser, function (req, res) {
-// });
 
-
-var isXiamiSong = /www.xiami.com\/song\/\d+/;
-var sidPattern = /(\d+)/;
-var songUrlPattern = /a href="(\/song\/\d+)"/g;
-
-app.get('/xiami/song',urlencodedParser, function(req, res) {
+app.get('/xia_mi/song',urlencodedParser, function(req, res) {
   const songId = req.query.id;
   var options = url.parse('http://www.xiami.com/song/playlist/id/'+ songId +'/object_name/default/object_id/0');
   var xiamiRealSong = {};

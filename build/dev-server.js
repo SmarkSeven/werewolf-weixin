@@ -47,12 +47,68 @@ compiler.plugin('compilation', function (compilation) {
 })
 
 // proxy api requests
-Object.keys(proxyTable).forEach(function (context) {
-  var options = proxyTable[context]
-  if (typeof options === 'string') {
-    options = { target: options }
-  }
+// Object.keys(proxyTable).forEach(function (context) {
+//   var options = proxyTable[context]
+//   if (typeof options === 'string') {
+//     options = { target: options }
+//   }
+//   app.use(proxyMiddleware(options.filter || context, options))
+// })
+
+var postProxyArr = [
+  '/praise/add',
+  '/movie/praisestory',
+  '/comment/praise',
+  '/comment/unpraise',
+  '/collection/add',
+  '/collection/del',
+  '/user/follow',
+  '/user/follow_cancel',
+  '/comment/add'
+]
+
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+postProxyArr.forEach(function (context) {
+  var  options = { target: 'http://v3.wufazhuce.com:8000/api' }
   app.use(proxyMiddleware(options.filter || context, options))
+  app.post(context, urlencodedParser, function (req, res) {});
+})
+
+var getProxyArr = [
+  '/channel/reading/more/*',
+  '/onelist/idlist',
+  '/onelist/*/0',
+  '/channel/reading/more/*',
+  '/channel/music/more/*',
+  '/channel/movie/more/*',
+  '/author/works',
+  '/user/follow_list/',
+  '/collection/more/*/0',
+  '/comment/praiseandtime/essay/*/*',
+  '/comment/praiseandtime/*/*/*',
+  '/essay/*',
+  '/related/essay/*',
+  '/essay/update/*/*',
+  '/movie/*/story/1/0',
+  '/movie/detail/*',
+  '/comment/praiseandtime/movie/*/0',
+  '/related/movie/*',
+  '/movie/update/*/*',
+  '/xiami/*',
+  '/music/detail/*',
+  '/comment/praiseandtime/music/*/0',
+  '/related/music/*',
+  '/music/update/*/*',
+  '/user/follow_list',
+  '/question/*',
+  '/comment/praiseandtime/question/*/0',
+  '/related/question/*',
+  '/search/*/*',
+]
+getProxyArr.forEach(function (context) {
+  var  options = { target: 'http://v3.wufazhuce.com:8000/api' }
+  app.use(proxyMiddleware(options.filter || context, options))
+  // app.get(context, function (req, res) {});
 })
 
 // handle fallback for HTML5 history API
@@ -69,30 +125,30 @@ app.use(hotMiddleware)
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
-app.post('/praise/add', urlencodedParser, function (req, res) {
-});
-app.post('/movie/praisestory', urlencodedParser, function (req, res) {
-});
-app.post('/comment/praise', urlencodedParser, function (req, res) {
-});
-app.post('/comment/unpraise', urlencodedParser, function (req, res) {
-});
-app.post('/collection/add', urlencodedParser, function (req, res) {
-});
-app.post('/collection/del', urlencodedParser, function (req, res) {
-});
-app.post('/user/follow', urlencodedParser, function (req, res) {
-});
-app.post('/user/follow_cancel', urlencodedParser, function (req, res) {
-});
-app.post('/comment/add', urlencodedParser, function (req, res) {
-});
-var isXiamiSong = /www.xiami.com\/song\/\d+/;
-var sidPattern = /(\d+)/;
-var songUrlPattern = /a href="(\/song\/\d+)"/g;
+// var urlencodedParser = bodyParser.urlencoded({ extended: false })
+// app.post('/praise/add', urlencodedParser, function (req, res) {
+// });
+// app.post('/movie/praisestory', urlencodedParser, function (req, res) {
+// });
+// app.post('/comment/praise', urlencodedParser, function (req, res) {
+// });
+// app.post('/comment/unpraise', urlencodedParser, function (req, res) {
+// });
+// app.post('/collection/add', urlencodedParser, function (req, res) {
+// });
+// app.post('/collection/del', urlencodedParser, function (req, res) {
+// });
+// app.post('/user/follow', urlencodedParser, function (req, res) {
+// });
+// app.post('/user/follow_cancel', urlencodedParser, function (req, res) {
+// });
+// app.post('/comment/add', urlencodedParser, function (req, res) {
+// });
+// var isXiamiSong = /www.xiami.com\/song\/\d+/;
+// var sidPattern = /(\d+)/;
+// var songUrlPattern = /a href="(\/song\/\d+)"/g;
 
-app.get('/xiami/song',urlencodedParser, function(req, res) {
+app.get('/xia_mi/song',urlencodedParser, function(req, res) {
   const songId = req.query.id;
   var options = url.parse('http://www.xiami.com/song/playlist/id/'+ songId +'/object_name/default/object_id/0');
   var xiamiRealSong = {};
