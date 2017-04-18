@@ -137,7 +137,7 @@ export default{
   beforeRouteUpdate(to, from, next) {
     const contentId = to.params.id;
     this.getData(contentId);
-    next(;
+    next();
   },
   methods: {
     getData(contentId) {
