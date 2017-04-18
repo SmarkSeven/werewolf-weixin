@@ -193,18 +193,18 @@ export default{
       if (cardItem.category === '0') {
         return;
       } else if (cardItem.category === '1') { // 前往阅读视图
-        path = `essay/${cardItem.content_id}`;
+        path = `/essay/${cardItem.content_id}`;
       } else if (cardItem.category === '3') { // 前往问答视图
-        path = `question/${cardItem.content_id}`;
+        path = `/question/${cardItem.content_id}`;
       } else if (cardItem.category === '4') { // 前往音乐视图
         console.log(cardItem.audio_platform);
         if (cardItem.audio_platform === '2') {
-          path = `music/${cardItem.content_id}/one`;
+          path = `/music/${cardItem.content_id}/one`;
         } else {
-          path = `music/${cardItem.content_id}/${cardItem.audio_url}`;
+          path = `/music/${cardItem.content_id}/${cardItem.audio_url}`;
         }
       } else if (cardItem.category === '5') {
-        path = `movie/${cardItem.content_id}`;
+        path = `/movie/${cardItem.content_id}`;
       }
       this.updateDirection({ direction: 'forward' });
       this.$router.push({ path });

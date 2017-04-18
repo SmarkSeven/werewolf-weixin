@@ -137,7 +137,7 @@ export default{
   beforeRouteUpdate(to, from, next) {
     const contentId = to.params.id;
     this.getData(contentId);
-    next();
+    next(;
   },
   methods: {
     getData(contentId) {
@@ -149,11 +149,12 @@ export default{
     },
     async getMovieData(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/movie/${contentId}/story/1/0?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/movie/${contentId}/story/1/0?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.movie = result.data.data[0];
-          // console.log(this.movie);
+          const page = document.querySelector('#movie-page');
+          page.scrollTop = '0';
         }
       } catch (err) {
         console.log(err);
@@ -161,7 +162,7 @@ export default{
     },
     async getMovieDetail(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/movie/detail/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/movie/detail/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.movieDetail = result.data;
@@ -172,7 +173,7 @@ export default{
     },
     async getCommentData(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/movie/${contentId}/0?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/comment/praiseandtime/movie/${contentId}/0?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.comments = result.data.data;
@@ -183,7 +184,7 @@ export default{
     },
     async getRelated(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/related/movie/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/related/movie/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.related = result.data;
@@ -195,7 +196,7 @@ export default{
     async getUpdate(contentId) {
       const dateString = new Date().toLocaleString().replace(/[\u4e00-\u9fa5]/g, '').replace(/\//g, '-');
       try {
-        const resp = await this.$http.get(`${this.host}/movie/update/${contentId}/${dateString}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/movie/update/${contentId}/${dateString}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.update = result.data;

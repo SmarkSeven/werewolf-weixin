@@ -121,7 +121,7 @@ export default{
       const params = new URLSearchParams(this.basicQueryString);
       params.set('uid', 5105554);
       params.set('last_id', 0);
-      const resp = await this.$http.get(`${this.host}/user/follow_list/?${params.toString()}`);
+      const resp = await this.$http.get(`/user/follow_list/?${params.toString()}`);
       const result = resp.data;
       if (resp.status === 200 && result.res === 0) {
         this.items = result.data;
@@ -130,7 +130,7 @@ export default{
     async fetchCollection(type) {
       const params = new URLSearchParams(this.basicQueryString);
       params.set('jwt', this.jwt);
-      const resp = await this.$http.get(`${this.host}/collection/more/${type}/0?${params.toString()}`);
+      const resp = await this.$http.get(`/collection/more/${type}/0?${params.toString()}`);
       const result = resp.data;
       if (resp.status === 200 && result.res === 0) {
         if (type === 1) {

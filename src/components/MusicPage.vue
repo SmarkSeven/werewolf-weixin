@@ -177,7 +177,7 @@ export default{
     },
     async getMusicData(musicId) {
       try {
-        const resp = await this.$http.get(`${this.host}/xiami/${musicId}`);
+        const resp = await this.$http.get(`/xiami/${musicId}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.music = result.data;
@@ -188,11 +188,13 @@ export default{
     },
     async getMusicDetail(id) {
       try {
-        const resp = await this.$http.get(`${this.host}/music/detail/${id}`);
+        const resp = await this.$http.get(`/music/detail/${id}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.detail = result.data;
           this.authors = this.detail.author_list;
+          const page = document.querySelector('#music-page');
+          page.scrollTop = '0';
         }
       } catch (err) {
         console.log(err);
@@ -200,7 +202,7 @@ export default{
     },
     async getCommentData(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/music/${contentId}/0?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/comment/praiseandtime/music/${contentId}/0?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.comments = result.data.data;
@@ -211,7 +213,7 @@ export default{
     },
     async getRelated(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/related/music/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/related/music/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.related = result.data;
@@ -223,7 +225,7 @@ export default{
     async getUpdate(contentId) {
       const dateString = new Date().toLocaleString().replace(/[\u4e00-\u9fa5]/g, '').replace(/\//g, '-');
       try {
-        const resp = await this.$http.get(`${this.host}/music/update/${contentId}/${dateString}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/music/update/${contentId}/${dateString}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.update = result.data;

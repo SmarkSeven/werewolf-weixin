@@ -107,7 +107,7 @@ export default{
       params.set('type', 1);
       params.set('channel', 'oppo');
       try {
-        const resp = await this.$http.get(`${this.host}/user/follow_list?${params.toString()}`);
+        const resp = await this.$http.get(`/user/follow_list?${params.toString()}`);
         const result = resp.data;
         if (result.res === 0) {
           this.followData = result.data;

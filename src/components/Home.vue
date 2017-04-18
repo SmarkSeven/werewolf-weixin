@@ -227,7 +227,7 @@ export default {
     },
     async fetchOneList() {
       // 获取每日列表的id列表
-      const resp = await this.$http.get(`${this.host}/onelist/idlist`);
+      const resp = await this.$http.get('/onelist/idlist');
       const result = resp.data;
       if (result.res === 0) {
         this.updateOneIdList({ oneIdList: result.data });
@@ -240,7 +240,7 @@ export default {
       if (this.currentIndex < this.maxIndex) {
         this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
         const oneListId = this.oneIdList[this.currentIndex];
-        this.$http.get(`${this.host}/onelist/${oneListId}/0?${this.basicQueryString}`)
+        this.$http.get(`/onelist/${oneListId}/0?${this.basicQueryString}`)
         .then((resp) => {
           if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
             this.updateOneList({ oneList: resp.data.data.content_list });
@@ -261,7 +261,7 @@ export default {
     },
     async fetchReadingData() {
       // 获取阅读列表
-      const resp = await this.$http.get(`${this.host}/channel/reading/more/${this.lastReadingId}?${this.basicQueryString}`);
+      const resp = await this.$http.get(`/channel/reading/more/${this.lastReadingId}?${this.basicQueryString}`);
       const result = resp.data;
       if (result.res === 0 && result.data && result.data.length > 0) {
         // 更新阅读列表数据
@@ -273,7 +273,7 @@ export default {
     },
     async fetchMusicData() {
       // 获取音乐列表
-      const resp = await this.$http.get(`${this.host}/channel/music/more/${this.lastMusicId}?${this.basicQueryString}`);
+      const resp = await this.$http.get(`/channel/music/more/${this.lastMusicId}?${this.basicQueryString}`);
       const result = resp.data;
       if (result.res === 0 && result.data && result.data.length > 0) {
         // 更新音乐列表数据
@@ -285,7 +285,7 @@ export default {
     },
     async fetchMovieData() {
       // 获取影视列表
-      const resp = await this.$http.get(`${this.host}/channel/movie/more/${this.lastMovieId}?${this.basicQueryString}`);
+      const resp = await this.$http.get(`/channel/movie/more/${this.lastMovieId}?${this.basicQueryString}`);
       const result = resp.data;
       if (result.res === 0 && result.data && result.data.length > 0) {
         // 更新影视列表数据

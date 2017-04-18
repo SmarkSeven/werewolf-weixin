@@ -108,7 +108,7 @@ export default {
       params.set('author_id', authorId);
       params.set('page_num', pageNum);
       try {
-        const resp = await this.$http.get(`${this.host}/author/works?${params.toString()}`);
+        const resp = await this.$http.get(`/author/works?${params.toString()}`);
         const result = resp.data;
         if (result.res === 0 && result.data.length > 0) {
           this.items.push(...result.data);

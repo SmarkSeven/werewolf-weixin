@@ -141,7 +141,7 @@ export default{
   },
   methods: {
     async fetchData(keyword, path) {
-      const resp = await this.$http.get(`${this.host}/search/${path}/${keyword}`);
+      const resp = await this.$http.get(`/search/${path}/${keyword}`);
       const result = resp.data;
       if (resp.status === 200 && result.res === 0) {
         switch (path) {

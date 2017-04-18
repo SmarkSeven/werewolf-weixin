@@ -132,10 +132,12 @@ export default{
     },
     async getQuestion(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/question/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/question/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.question = result.data;
+          const page = document.querySelector('#question-page');
+          page.scrollTop = '0';
         }
       } catch (err) {
         console.log(err);
@@ -143,7 +145,7 @@ export default{
     },
     async getCommentData(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/question/${contentId}/0?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/comment/praiseandtime/question/${contentId}/0?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.comments = result.data.data;
@@ -154,7 +156,7 @@ export default{
     },
     async getRelated(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/related/question/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/related/question/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.related = result.data;

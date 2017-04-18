@@ -31,7 +31,7 @@ export default {
   methods: {
     async getCommentData(contentId, commentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/${this.type}/${contentId}/${commentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/comment/praiseandtime/${this.type}/${contentId}/${commentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (commentId > 0) {
           this.loading = false;

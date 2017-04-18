@@ -158,13 +158,15 @@ export default{
     },
     async getEssayData(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/essay/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/essay/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (contentId) {
           this.loading = false;
         }
         if (result.res === 0 && result.data) {
           this.essay = result.data;
+          const page = document.querySelector('#essay-page');
+          page.scrollTop = 0;
         }
       } catch (err) {
         console.log(err);
@@ -172,7 +174,7 @@ export default{
     },
     async getCommentData(contentId, commentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/comment/praiseandtime/essay/${contentId}/${commentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/comment/praiseandtime/essay/${contentId}/${commentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (commentId > 0) {
           this.loading = false;
@@ -186,7 +188,7 @@ export default{
     },
     async getRelated(contentId) {
       try {
-        const resp = await this.$http.get(`${this.host}/related/essay/${contentId}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/related/essay/${contentId}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.related = result.data;
@@ -198,7 +200,7 @@ export default{
     async getUpdate(contentId) {
       const dateString = new Date().toLocaleString().replace(/[\u4e00-\u9fa5]/g, '').replace(/\//g, '-');
       try {
-        const resp = await this.$http.get(`${this.host}/essay/update/${contentId}/${dateString}?${this.basicQueryString}`);
+        const resp = await this.$http.get(`/essay/update/${contentId}/${dateString}?${this.basicQueryString}`);
         const result = resp.data;
         if (result.res === 0 && result.data) {
           this.update = result.data;
