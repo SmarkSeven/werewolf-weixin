@@ -3,7 +3,6 @@ var express = require('express')
 var url = require('url');
 var http = require('http');
 var xmlreader = require('xmlreader');
-var webpack = require('webpack')
 var bodyParser = require('body-parser')
 var proxyMiddleware = require('http-proxy-middleware')
 
