@@ -90,7 +90,6 @@ export default{
       let boxShadow;
       const scrollTop = e.target.scrollTop;
       let opacity;
-      console.log(e.target);
       if (scrollTop <= 46) {
         opacity = scrollTop / 46;
         boxShadow = 'none';
@@ -110,7 +109,6 @@ export default{
       try {
         const resp = await this.$http.get(`${this.host}/user/follow_list?${params.toString()}`);
         const result = resp.data;
-        console.log(result);
         if (result.res === 0) {
           this.followData = result.data;
         }
@@ -175,10 +173,12 @@ export default{
       height: rem(188);
       width: rem(188);
       border-radius: 50%;
+      border: 1px solid #555;
     }
     .nickname {
       margin-top: rem(24);
-      font-size: 13px;
+      font-size: 14px;
+      font-weight: 600;
       color: #000;
     }
   }

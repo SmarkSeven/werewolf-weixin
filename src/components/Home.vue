@@ -132,18 +132,12 @@ export default {
       }
       const position = vm.savedPosition[to.path];
       if (position) {
-        if (to.path === '/') {
-          console.log('enter:', position.top);
-        }
         vm.$refs.wrapper.scrollTop = position.top;
       }
     });
   },
   beforeRouteLeave(to, from, next) {
     const top = this.$refs.wrapper.scrollTop;
-    if (from.path === '/') {
-      console.log('leave', top);
-    }
     // 离开时记录滚动位置
     this.updateSavedPosition({
       path: from.path,
@@ -204,7 +198,11 @@ export default {
       this.$router.push('search');
     },
     share() {
-      console.log('I want to share it whith my freinds.');
+      Toast({
+        message: '很快就会有的:-D',
+        position: 'bottom',
+        duration: 1000,
+      });
     },
     getData() {
       // 获取数据

@@ -126,10 +126,10 @@ export default{
     font-size: 14px;
     font-weight: 500;
   }
-  .img{
-    height: rem(570);
-    width: rem(1020);
-  }
+  // .img{
+  //   height: rem(570);
+  //   width: rem(1020);
+  // }
   .img-border {
     text-align: center;
     transform: scale(0.55);
@@ -202,7 +202,7 @@ export default{
     }
   }
   .inner-box {
-    padding: 0 rem(30);
+    // padding: 0 rem(30);
     img {
       width: 100%;
     }

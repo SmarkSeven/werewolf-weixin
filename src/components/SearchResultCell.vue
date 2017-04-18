@@ -17,7 +17,7 @@ export default{
       src: 'http://image.wufazhuce.com/Fq2rAhpbB-4oWN0iLLheD5sDALnA',
     };
   },
-  props: ['imgUrl', 'sub', 'content', 'type', 'id', 'musicId'],
+  props: ['imgUrl', 'sub', 'content', 'type', 'id', 'musicId', 'platform'],
   methods: {
     ...mapMutations([
       'updateMusicId',
@@ -29,7 +29,11 @@ export default{
     onClick() {
       let path = `/${this.type}/${this.id}`;
       if (this.type === 'music') {
-        path = `/${this.type}/${this.id}/${this.musicId}`;
+        if (this.platform === '2') {
+          path = `/${this.type}/${this.id}/one`;
+        } else {
+          path = `/${this.type}/${this.id}/${this.musicId}`;
+        }
       }
       this.$router.push({ path });
     },

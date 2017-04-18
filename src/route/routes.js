@@ -9,10 +9,11 @@ import MusicPage from '../components/MusicPage';
 import MoviePage from '../components/MoviePage';
 import QuestionPage from '../components/QuestionPage';
 import Profile from '../components/Profile';
-import AuhtorPage from '../components/AuthorPage.vue';
+import AuhtorPage from '../components/AuthorPage';
 import SearchResultPage from '../components/SearchResultPage';
 import VideoPage from '../components/VideoPage';
-import HpPage from '../components/HpPage.vue';
+import HpPage from '../components/HpPage';
+import CollectionPage from '../components/CollectionPage';
 
 const routes = [
   {
@@ -85,6 +86,22 @@ const routes = [
   {
     path: '/author/:authorId',
     component: AuhtorPage,
+  },
+  {
+    path: '/follow',
+    component: CollectionPage,
+  },
+  {
+    path: '/collection/reading',
+    component: CollectionPage,
+  },
+  {
+    path: '/collection/music',
+    component: CollectionPage,
+  },
+  {
+    path: '/collection/movie',
+    component: CollectionPage,
   },
 ];
 

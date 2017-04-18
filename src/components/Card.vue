@@ -164,15 +164,20 @@ export default{
         this.updatePlayState({ playState: 'playing' });
         return;
       }
+      const playload = {
+        musicTitle: this.cardItem.music_name,
+        musicId: this.musicId,
+        singer: this.cardItem.audio_author,
+        audioUrl: this.musicId,
+      };
       // 当前音乐不处于就绪状态
-      const self = this;
       if (this.cardItem.audio_platform === '1') {
-        const playload = {
-          musicTitle: self.cardItem.music_name,
-          musicId: self.musicId,
-          singer: self.cardItem.audio_author,
-        };
+        // 音频来多米音乐
         this.fetchAudioFromXiami(playload);
+      }
+      if (this.cardItem.audio_platform === '2') {
+        this.updatePlayList({ playList: [playload] });
+        this.updatePlayIndex({ playIndex: 0 });
       }
     },
     clickImg() {
@@ -184,21 +189,6 @@ export default{
     },
     clickCard() {
       const cardItem = this.cardItem;
-      // this.updateCurrentItemCategory({ currentItemCategory: cardItem.content_type });
-      // if (cardItem.content_type === '4') {
-      //   // this.updateMusicId({ musicId: Number(this.musicId) });
-      //   // this.updateMusicName({ musicName: cardItem.music_name });
-      //   // this.updateAudioAuthor({ audioAuthor: cardItem.audio_author });
-      //   // this.updateMusicTitle({ title: cardItem.title });
-      //   // this.updateAudioAlbum({ audioAlbum: cardItem.audio_album });
-      //   // this.updateWordsAuthor({ author: this.author });
-      // }
-      // if (cardItem.content_type === '3') {
-      //   this.updateQuestionId({ questionId: cardItem.question_id });
-      // }
-      // if (cardItem.content_type === '1' && this.cardItem.tag_list.length === 0) {
-      //   this.updateReadingAuthorName({ authorName: cardItem.author.user_name });
-      // }
       let path = '';
       if (cardItem.category === '0') {
         return;
@@ -207,7 +197,12 @@ export default{
       } else if (cardItem.category === '3') { // 前往问答视图
         path = `question/${cardItem.content_id}`;
       } else if (cardItem.category === '4') { // 前往音乐视图
-        path = `music/${cardItem.content_id}/${cardItem.audio_url}`;
+        console.log(cardItem.audio_platform);
+        if (cardItem.audio_platform === '2') {
+          path = `music/${cardItem.content_id}/one`;
+        } else {
+          path = `music/${cardItem.content_id}/${cardItem.audio_url}`;
+        }
       } else if (cardItem.category === '5') {
         path = `movie/${cardItem.content_id}`;
       }

@@ -25,8 +25,7 @@
         infinite-scroll-distance="10"
         infinite-scroll-immediate-check="false">
         <mt-tab-container-item v-for="(tab,index) in tabs" :key="index" :id="tab">
-          <transition name="one-pop-in" mode="out-in">
-            <div v-if="selected === 'hp'">
+            <div v-if="selected === 'hp' && data.length !== 0">
               <transition-group name="list" tag="div">
                 <cell v-for="item in data"
                   :key="item.hpcontent_id"
@@ -38,7 +37,7 @@
                 </cell>
               </transition-group>
             </div>
-            <div v-if="selected === 'reading'">
+            <div v-else-if="selected === 'reading' && data.length !== 0">
               <transition-group name="list" tag="div">
                 <cell v-for="item in data"
                   :sub="item.type | readingType"
@@ -49,20 +48,21 @@
                 </cell>
               </transition-group>
             </div>
-            <div v-if="selected === 'music'">
+            <div v-else-if="selected === 'music' && data.length !== 0">
               <transition-group name="list" tag="div">
                 <cell v-for="item in data"
                   :imgUrl="item.cover || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='"
                   :sub="item.title"
                   :content="item.author.user_name"
                   :id="item.id"
+                  :platform="item.platform"
                   :musicId="item.music_id"
                   type="music"
                   :key="item.music_id">
                 </cell>
               </transition-group>
             </div>
-            <div v-if="selected === 'movie'">
+            <div v-else-if="selected === 'movie' && data.length !== 0">
               <transition-group name="list" tag="div">
                 <cell v-for="item in data"
                   sub="影视"
@@ -73,7 +73,7 @@
                 </cell>
               </transition-group>
             </div>
-            <div v-if="selected === 'author'">
+            <div v-else-if="selected === 'author' && data.length !== 0">
               <transition-group name="list" tag="div">
                 <cell v-for="item in data"
                   :imgUrl="item.web_url || 'data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXs7Oxc9QatAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='"
@@ -85,10 +85,6 @@
                 </cell>
               </transition-group>
             </div>
-            <div v-if="data.length === 0 && loaded" class="no-search-result">
-              <x-icon type="social-buffer-outline" size="40"></x-icon>
-            </div>
-          </transition>
         </mt-tab-container-item>
       </mt-tab-container>
     </main>
@@ -293,6 +289,9 @@ export default{
     .vux-x-icon {
       fill: #a0a0a0;
     }
+  }
+  .back {
+    padding-right: rem(20);
   }
   input[type=text] {
     width: rem(800);

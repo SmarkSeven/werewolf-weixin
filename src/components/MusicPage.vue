@@ -87,16 +87,20 @@ export default{
       // musicName: state => state.music.musicName,
     }),
     title() {
-      return this.music && this.music.title;
+      return this.detail && this.detail.title;
     },
     cover() {
-      return this.music && this.music.cover;
+      return this.detail && this.detail.cover;
     },
     album() {
       return this.detail && this.detail.album;
     },
     singer() {
-      const regexp = /(演唱者：).*(?=\r\n作词)/;
+      let regexp = /(主播：).*(?=\r\n策划)/;
+      if (this.params.musicId === 'one') {
+        return this.detail && this.detail.info.match(regexp, '')[0].replace('演唱者：', '');
+      }
+      regexp = /(演唱者：).*(?=\r\n作词)/;
       return this.detail && this.detail.info.match(regexp, '')[0].replace('演唱者：', '');
     },
     authorName() {
@@ -105,6 +109,9 @@ export default{
       }
     },
     content() {
+      if (this.params.musicId === 'one') {
+        return this.detail && this.detail.story;
+      }
       return this.music && this.music.story.replace(/style="height:\d+px; width:\d+px"/g, '');
     },
     // authorName() {
@@ -118,7 +125,7 @@ export default{
     },
     // 当前音乐是否正在播放
     isPlaying() {
-      return String(this.params.musicId) === this.playId && this.playState === 'playing';
+      return String(this.detail.music_id) === this.playId && this.playState === 'playing';
     },
     headerData() {
       return this.detail && {
@@ -132,8 +139,8 @@ export default{
       };
     },
     footerData() {
-      return this.music && this.update && {
-        contentId: this.music.id,
+      return this.detail && this.update && {
+        contentId: this.detail.id,
         category: 4,
         praisenum: this.update.praisenum,
         commentnum: this.update.commentnum,
@@ -160,7 +167,9 @@ export default{
       'updatePlayId']),
     ...mapActions(['fetchAudioFromXiami']),
     getData(contentId, musicId) {
-      this.getMusicData(musicId);
+      if (musicId !== 'one') {
+        this.getMusicData(musicId);
+      }
       this.getMusicDetail(contentId);
       this.getCommentData(contentId);
       this.getRelated(contentId);
@@ -225,21 +234,29 @@ export default{
     },
     play() {
       // 正在播放当前音乐则暂停
-      if (this.music.music_id === this.playId && this.playState === 'playing') {
+      if (this.detail.music_id === this.playId && this.playState === 'playing') {
         this.updatePlayState({ playState: 'pause' });
         return;
       }
       // 当前音乐处于暂停状态则播放
-      if (this.music.music_id === this.playId && this.playState === 'pause') {
+      if (this.detail.music_id === this.playId && this.playState === 'pause') {
         this.updatePlayState({ playState: 'playing' });
         return;
       }
       const playload = {
-        musicId: String(this.params.musicId),
+        musicId: String(this.detail.music_id),
         singer: this.singer,
         musicTitle: this.title,
+        audioUrl: this.detail.music_id,
       };
-      this.fetchAudioFromXiami(playload);
+      // 当前音乐不处于就绪状态
+      if (this.params.musicId === 'one') {
+        this.updatePlayList({ playList: [playload] });
+        this.updatePlayIndex({ playIndex: 0 });
+      } else {
+        // 音频来多米音乐
+        this.fetchAudioFromXiami(playload);
+      }
     },
     toAuthor() {
     },

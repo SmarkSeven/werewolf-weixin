@@ -77,6 +77,7 @@ body {
 /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar
 {
+  display: none;
 	width: 4px;
 	background-color: #F5F5F5;
 }
@@ -84,6 +85,7 @@ body {
 /*定义滚动条轨道 内阴影+圆角*/
 ::-webkit-scrollbar-track
 {
+  display: none;
 	background-color: white;
 
 }
@@ -91,6 +93,7 @@ body {
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb
 {
+  display: none;
   box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: #555;
 }
