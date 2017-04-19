@@ -3,7 +3,7 @@
     infinite-scroll-disabled="loading"
     infinite-scroll-distance="10">
     <li v-for="(comment,index) in comments">
-      <comment :comment="comment" :type="type" :key="comment.id" @clickComment="replay"></comment>
+      <comment :comment="comment" :itemId="contentId" :type="type" :key="comment.id" @clickComment="replay"></comment>
     </li>
   </ul>
 </template>
