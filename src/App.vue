@@ -67,10 +67,10 @@ export default {
     checkBrowser() {
       const system = {};
       const userAgent = navigator.userAgent;
-      system.iphone = userAgent.indexOf('iphone') !== -1;
+      system.iPhone = userAgent.indexOf('iPhone') !== -1;
       system.android = userAgent.indexOf('Android') !== -1;
       system.iPad = userAgent.indexOf('iPad') !== -1;
-      if (!system.iphone && !system.android && !system.iPad) {
+      if (!system.iPhone && !system.android && !system.iPad) {
         this.isMobile = false;
         this.showNotification = true;
       } else {
