@@ -1,141 +1,66 @@
 <template>
   <div id="app">
-    <transition name="one-fade-top">
-      <music-player class="player" v-show="showMusicPlayer && isMobile"></music-player>
-    </transition>
-    <transition name="one-fade-right">
-        <player-toggle v-show="showPlayerToggle && isMobile"></player-toggle>
-    </transition>
-    <transition v-if="isMobile" :name="direction === 'forward' ? 'one-pop-in' : 'one-pop-out'">
+    <transition :name="transitionName">
       <router-view class="router-view"></router-view>
     </transition>
-    <notification
-      :options="options"
-      :show="showNotification"
-      @close="closeNotification">
-    </notification>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import MusicPlayer from './components/MusicPlayer';
-import PlayerToggle from './components/PlayerToggle';
-import Notification from './components/Notification';
 
 export default {
   name: 'app',
-  data() {
-    return {
-      isMobile: true,
-      showNotification: false,
-      showPlayerToggle: false,
-      options: {
-        autoClose: true,
-        backgroundColor: '#fc5050',
-        barColor: '#415f77',
-        countdownBar: false,
-        content: '这是一个 Mobile web 项目, 请用移动浏览器浏览',
-        showTime: 5000,
-        textColor: '#fff',
-      },
-    };
-  },
-  components: {
-    MusicPlayer,
-    PlayerToggle,
-    Notification,
-  },
   computed: {
     ...mapState({
-      showMusicPlayer: state => state.one.showMusicPlayer,
-      playState: state => state.music.playState,
-      direction: state => state.one.direction,
+      direction: state => state.app.direction,
     }),
-    enterActiveClass() {
+    transitionName() {
+      if (this.direction === 'begin') {
+        return;
+      }
       if (this.direction === 'forward') {
-        return 'animated fadeInRight';
+        return 'pop-in';
       }
-      return 'animated fadeInLeft';
-    },
-  },
-  methods: {
-    closeNotification() {
-      this.showNotification = false;
-      this.options = {};
-    },
-    checkBrowser() {
-      const system = {};
-      const userAgent = navigator.userAgent;
-      system.iPhone = userAgent.indexOf('iPhone') !== -1;
-      system.android = userAgent.indexOf('Android') !== -1;
-      system.iPad = userAgent.indexOf('iPad') !== -1;
-      if (!system.iPhone && !system.android && !system.iPad) {
-        this.isMobile = false;
-        this.showNotification = true;
-      } else {
-        this.isMobile = true;
-        this.showNotification = false;
-      }
-    },
-  },
-  watch: {
-    playState() {
-      if (this.playState === 'playing' && !this.showPlayerToggle) {
-        this.showPlayerToggle = true;
-      }
-    },
-  },
-  created() {
-    this.checkBrowser();
-    const body = document.querySelector('body');
-    body.onresize = this.checkBrowser;
-  },
+      return 'pop-out';
+    }
+  }
 };
 </script>
 
 <style lang="less">
-@import '../src/styles/animate.css';
 @import '~vux/src/styles/reset.less';
-* {
-  box-sizing: border-box;
+html, body, #app {
+  height: 100%;
 }
 body {
-  background-color: #fff;
+  background-color: #f5f5f5;
 }
-#app {
+.pop-out-enter-active,
+.pop-out-leave-active,
+.pop-in-enter-active,
+.pop-in-leave-active {
+  will-change: transform;
+  transition: all 500ms;
   height: 100%;
-  .player {
-    height: 100%;
-    width: 100%;
-    z-index: 9999;
-  }
+  position: absolute;
+  backface-visibility: hidden;
+  perspective: 1000;
 }
-.router-view {
-  height: 100%;
+.pop-out-enter {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
 }
-
-/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
-::-webkit-scrollbar
-{
-  display: none;
-	width: 4px;
-	background-color: #F5F5F5;
+.pop-out-leave-active {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
 }
-
-/*定义滚动条轨道 内阴影+圆角*/
-::-webkit-scrollbar-track
-{
-  display: none;
-	background-color: white;
-
+.pop-in-enter {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
 }
-
-/*定义滑块 内阴影+圆角*/
-::-webkit-scrollbar-thumb
-{
-  display: none;
-  box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: #555;
+.pop-in-leave-active {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
 }
 </style>

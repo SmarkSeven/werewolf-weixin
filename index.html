@@ -3,60 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>one</title>
-
+    <title>组局工具</title>
+    <script type="text/javascript">
+      function searchParam(name) {
+         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+      }
+      if (!searchParam('code')) {
+        let url = encodeURIComponent(window.location.href);
+        window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e95556bd902571e&redirect_uri=' + url + '&response_type=code&scope=snsapi_base&state=123#wechat_redirect';
+      }
+    </script>
   </head>
   <body>
     <div id="app-box"></div>
     <!-- built files will be auto injected -->
   </body>
-  <script>
-  ;
- (function(win) {
-     var doc = win.document;
-     var docEl = doc.documentElement;
-     var metaEl = doc.querySelector('meta[name="viewport"]');
-     var scale = 1;
-     var tid;
-     if (!metaEl) {
-         metaEl = doc.createElement('meta');
-         metaEl.setAttribute('name', 'viewport');
-         metaEl.setAttribute('content', 'width=device-width, initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no');
-         if (docEl.firstElementChild) {
-             docEl.firstElementChild.appendChild(metaEl);
-         } else {
-             var wrap = doc.createElement('div');
-             wrap.appendChild(metaEl);
-             doc.write(wrap.innerHTML);
-         }
-     }
-
-     function refreshRem() {
-         var width = docEl.clientWidth;
-         var rem = width;
-         docEl.style.fontSize = rem + 'px';
-     }
-
-     win.addEventListener('resize', function() {
-         clearTimeout(tid);
-         tid = setTimeout(refreshRem, 300);
-     }, false);
-     win.addEventListener('pageshow', function(e) {
-         if (e.persisted) {
-             clearTimeout(tid);
-             tid = setTimeout(refreshRem, 300);
-         }
-     }, false);
-
-     if (doc.readyState === 'complete') {
-         doc.body.style.fontSize = 12 + 'px';
-     } else {
-         doc.addEventListener('DOMContentLoaded', function(e) {
-             doc.body.style.fontSize = 12 + 'px';
-         }, false);
-     }
-
-     refreshRem();
- })(window);
-  </script>
 </html>

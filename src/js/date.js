@@ -31,7 +31,7 @@ export default function getDateDiff(dateTimeStamp, isUTC) {
   } else if (mins >= 1) {
     result = `${Math.floor(mins)}分钟前`;
   } else {
-    result = '今天';
+    result = '刚才';
   }
   return result;
 }

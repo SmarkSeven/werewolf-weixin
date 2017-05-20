@@ -1,3 +1,0 @@
-@function rem($pixels, $designwidth: 1080) {
-  @return $pixels / $designwidth + rem;
-}

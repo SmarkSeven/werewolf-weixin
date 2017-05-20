@@ -4,11 +4,11 @@ var path = require('path')
 module.exports = {
   build: {
     env: require('./prod.env'),
-    index: path.resolve(__dirname, '../public/index.html'),
-    assetsRoot: path.resolve(__dirname, '../public'),
+    index: path.resolve(__dirname, '../dist/index.html'),
+    assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    productionSourceMap: true,
+    productionSourceMap: false,
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
     // Before setting to `true`, make sure to:
@@ -23,28 +23,11 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 5000,
+    port: 8080,
     autoOpenBrowser: false,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {
-      '/praise/add': 'http://v3.wufazhuce.com:8000/api',
-      '/movie/praisestory': 'http://v3.wufazhuce.com:8000/api',
-      '/comment/praise': 'http://v3.wufazhuce.com:8000/api',
-      '/comment/unpraise': 'http://v3.wufazhuce.com:8000/api',
-      '/collection/add': 'http://v3.wufazhuce.com:8000/api',
-      '/collection/del': 'http://v3.wufazhuce.com:8000/api',
-      '/user/follow': 'http://v3.wufazhuce.com:8000/api',
-      '/user/follow_cancel': 'http://v3.wufazhuce.com:8000/api',
-      '/comment/add': 'http://v3.wufazhuce.com:8000/api',
-      // '/xiami/audio': {
-      //   target: 'http://api.xiami.com',
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/xiami/audio': '/web'
-      //   }
-      // }
-    },
+    proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

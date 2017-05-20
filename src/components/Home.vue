@@ -1,393 +1,228 @@
 <template>
-  <div id="home-container">
-      <header-bar slot="header" :title="title">
-        <img src="../assets/individual_center.png" slot="left" @click="toProfile" alt="profile">
-        <div slot="right" @click="toSearch" alt="search" class="search-btn"></div>
-      </header-bar>
-      <main>
-        <div class="loadmore-wrapper" ref="wrapper">
-         <loadmore class="loadmore" id="load-more" :bottom-method="loadBottom" :autoFill="false" ref="loadmore">
-           <transition-group name="list" tag="ul">
-            <li v-for="(item,index) in data" :key="item.id">
-              <card :cardItem="item" @click-share="share" @on-img-click="showImg" :key="item.id"></card>
-            </li>
-           </transition-group>
-         </loadmore>
-        </div>
-      </main>
-      <tabbar>
-        <tabbar-item :selected="path === '/'" ref="tab-home" link="/">
-          <div slot="icon">
-              <x-icon type="android-home" :size="27"></x-icon>
-          </div>
-          <span slot="label">首页</span>
-        </tabbar-item>
-        <tabbar-item link="/reading" :selected="path === '/reading'" >
-          <div slot="icon">
-              <x-icon type="ios-paper" :size="27"></x-icon>
-          </div>
-          <span slot="label">阅读</span>
-        </tabbar-item>
-        <tabbar-item  link="/music" :selected="path === '/music'">
-          <div slot="icon" >
-              <x-icon type="ios-musical-note" :size="27"></x-icon>
-          </div>
-          <span slot="label">音乐</span>
-        </tabbar-item>
-        <tabbar-item link="/movie" :selected="path === '/movie'">
-          <div slot="icon">
-              <x-icon type="ios-film" :size="27"></x-icon>
-          </div>
-          <span slot="label">影视</span>
-        </tabbar-item>
-      </tabbar>
+  <div id="home">
+    <header ref="header">
+      <flexbox class="tab-box" :gutter="0">
+        <flexbox-item :span="selecte === 'tab-left' ? 3/4 : 1/4" class="tab-item"><div class="tab tab-left" :class="{'selected': selecte === 'tab-left'}" @click="clickLeftTab">发布</div></flexbox-item>
+        <flexbox-item class="tab-item"><div class="tab tab-lef" :class="{'selected': selecte === 'tab-right'}" @click="clickRightTab">参与</div></flexbox-item>
+      </flexbox>
+    </header>
+    <main ref="main">
+      <ul v-if="listData.length !== 0" class="activity-list">
+        <li v-for="data in listData" :key="'li' + data.id" @click="onCardlick(data.id)">
+          <card :data="data" :key="data.id" :data-id="data.id"></card>
+        </li>
+      </ul>
+      <div v-if="listData.length === 0 && loaded" class="notice">{{noticeText}}</div>
+    </main>
+    <div class="new-btn" @click="toMakeActivity"></div>
   </div>
 </template>
-
 <script>
-import { ViewBox, ButtonTab, ButtonTabItem, Spinner, Group, Cell, Tabbar, TabbarItem } from 'vux';
-import { mapState, mapMutations, mapActions } from 'vuex';
-import { Loadmore, Toast } from 'mint-ui';
-import HeaderBar from './HeaderBar';
-import Card from './Card';
+import { mapState } from 'vuex';
+import { Flexbox, FlexboxItem } from 'vux';
+import Card from './ActivityCard';
 
 export default {
-  components: {
-    ViewBox,
-    Group,
-    Cell,
-    ButtonTab,
-    ButtonTabItem,
-    Loadmore,
-    Tabbar,
-    TabbarItem,
-    HeaderBar,
-    Spinner,
-    Card,
-    Toast,
-  },
   data() {
     return {
-      allLoaded: false,
-      loadmoreToggle: false,
-    };
+      selecte: 'tab-left',
+      makedActivitys: [],
+      joinedActivitys: [],
+      loaded: false,
+    }
+  },
+  components: {
+    Flexbox,
+    FlexboxItem,
+    Card,
   },
   computed: {
     ...mapState({
-      path: state => state.route.path,
-      host: state => state.one.host,
-      jwt: state => state.one.jwt,
-      basicQueryString: state => state.one.basicQueryString,
-      lastReadingId: state => state.one.lastReadingId,
-      lastMusicId: state => state.one.lastMusicId,
-      lastMovieId: state => state.one.lastMovieId,
-      weather: state => state.one.weather,
-      currentIndex: state => state.one.currentIndex,
-      maxIndex: state => state.one.maxIndex,
-      oneIdList: state => state.one.oneIdList,
-      oneList: state => state.one.oneList,
-      readingList: state => state.one.readingList,
-      musicList: state => state.one.musicList,
-      movieList: state => state.one.movieList,
-      praiseContents: state => state.storage.praiseContents,
-      savedPosition: state => state.one.savedPosition,
+      currentUser: state => state.app.currentUser,
     }),
-    title() {
-      switch (this.path) {
-        case '/music':
-          return '一个音乐';
-        case '/reading':
-          return '一个阅读';
-        case '/movie':
-          return '一个电影';
-        default:
-          return '一个';
+    listData() {
+      if (this.selecte === 'tab-left') {
+        return this.makedActivitys;
       }
+      return this.joinedActivitys;
     },
-    data() {
-      switch (this.path) {
-        case '/music':
-          return this.musicList;
-        case '/reading':
-          return this.readingList;
-        case '/movie':
-          return this.movieList;
-        default:
-          return this.oneList;
+    noticeText() {
+      if (this.selecte === 'tab-left') {
+        return '快来发起你的第一个活动吧:-D';
       }
+      return '你还未参与任何活动:-D';
     },
-    pathDataMap() {
-      return {
-        '/': this.oneList,
-        '/reading': this.readingList,
-        '/music': this.musicList,
-        '/movie': this.movieList,
-      };
-    },
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (vm.pathDataMap[vm.path].length === 0) {
-        vm.getData();
-      }
-      const position = vm.savedPosition[to.path];
-      if (position) {
-        vm.$refs.wrapper.scrollTop = position.top;
-      }
-    });
-  },
-  beforeRouteLeave(to, from, next) {
-    const top = this.$refs.wrapper.scrollTop;
-    // 离开时记录滚动位置
-    this.updateSavedPosition({
-      path: from.path,
-      position: { top, left: 0 },
-    });
-    next();
   },
   methods: {
-    ...mapMutations([
-      'updateLastReadingId',
-      'updateLastMusicId',
-      'updateLastMovieId',
-      'updateWeather',
-      'updateOneIdList',
-      'updateCurrentIndex',
-      'updateMaxIndex',
-      'updateOneList',
-      'pushReadingList',
-      'pushMusicList',
-      'pushMovieList',
-      'pushPraiseContentId',
-      'deletePraiseContentId',
-      'updatePraisenum',
-      'updateSavedPosition',
-      'updateDirection',
-    ]),
-    ...mapActions(['praise']),
-    type(category) {
-      switch (category) {
-        case 0: // 绘画
-          return 'hpcontent';
-        case 1: // 阅读
-          return 'essay';
-        case 2: // 连载
-          return 'serial';
-        case 3: // 问答
-          return 'question';
-        case 4: // 音乐
-          return 'music';
-        case 5: // 电影
-          return 'movie';
-        default:
-          return '';
+    clickLeftTab() {
+      if (this.selecte === 'tab-right') {
+        this.selecte = 'tab-left';
       }
     },
-    showImg() {
+    clickRightTab() {
+      if (this.selecte === 'tab-left') {
+        this.selecte = 'tab-right';
+      }
     },
-    loadBottom() {
-      this.getData();
-      setTimeout(this.$refs.loadmore.onBottomLoaded, 1000);
+    onCardlick(acId) {
+      this.$router.push({ name: 'activitydetail', params: { id: acId } });
     },
-    toProfile() {
-      this.updateDirection({ direction: 'back' });
-      this.$router.push('profile');
+    toMakeActivity() {
+      this.$router.push('makeactivity');
     },
-    toSearch() {
-      this.updateDirection({ direction: 'forward' });
-      this.$router.push('search');
-    },
-    share() {
-      Toast({
-        message: '很快就会有的:-D',
-        position: 'bottom',
-        duration: 1000,
-      });
-    },
-    getData() {
-      // 获取数据
-      try {
-        if (this.path === '/') {
-          // this.fetchOneList();
-          if (this.currentIndex === -1) {
-            this.fetchOneList();
-          } else {
-            this.fetchOneData();
-          }
-        } else if (this.path === '/reading') {
-          this.fetchReadingData();
-        } else if (this.path === '/music') {
-          this.fetchMusicData();
-        } else if (this.path === '/movie') {
-          this.fetchMovieData();
-        }
-      } catch (err) {
+    fetchData() {
+      // 获取用户发起的活动
+      const query = new this.$AV.Query('Activity');
+      query.equalTo('owner', this.currentUser);
+      query.addDescending('createdAt');
+      query.find().then((activitys) => {
+        activitys.forEach((activity) => {
+          const ac = activity.attributes;
+          ac.id = activity.id;
+          ac.createdAt = activity.createdAt;
+          this.makedActivitys.push(ac);
+        });
+        this.datas = this.makedActivitys;
+        this.$vux.loading.hide();
+        this.loaded = true;
+      }, (err) => {
+        // 异常处理
+        this.$vux.loading.hide();
         console.log(err);
-      }
-    },
-    async fetchOneList() {
-      // 获取每日列表的id列表
-      const resp = await this.$http.get('/onelist/idlist');
-      const result = resp.data;
-      if (result.res === 0) {
-        this.updateOneIdList({ oneIdList: result.data });
-        this.updateMaxIndex({ maxIndex: result.data.length - 1 });
-        this.fetchOneData();
-      }
-    },
-    fetchOneData() {
-      // 获取每日列表
-      if (this.currentIndex < this.maxIndex) {
-        this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
-        const oneListId = this.oneIdList[this.currentIndex];
-        this.$http.get(`/onelist/${oneListId}/0?${this.basicQueryString}`)
-        .then((resp) => {
-          if (resp.data.res === 0 && resp.data.data && resp.data.data.content_list.length > 0) {
-            this.updateOneList({ oneList: resp.data.data.content_list });
-            this.updateWeather({ weather: resp.data.data.weather });
-            this.$refs.wrapper.scrollTop = 0;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
+      });
+      // 获取用户参与的活动
+      const mapQuery = new this.$AV.Query('UserActivityMap');
+      mapQuery.equalTo('user', this.currentUser);
+      query.addDescending('createdAt');
+      mapQuery.include('activity');
+      mapQuery.find().then((uams) => {
+        uams.forEach((uam) => {
+          const activity = uam.get('activity');
+          const ac = activity.attributes;
+          ac.id = activity.id;
+          ac.createdAt = activity.createdAt;
+          this.joinedActivitys.push(ac);
         });
+      }, (err) => {
+        // 异常处理
+        console.log(err);
+      });
+    }
+  },
+  created() {
+    this.$vux.loading.show({
+      text: '数据加载中'
+    });
+    const selt = this;
+    function timer() {
+      if (selt.currentUser) {
+        selt.fetchData();
       } else {
-        Toast({
-          message: ':-D 没有更多了',
-          position: 'bottom',
-          duration: 1000,
-        });
+        setTimeout(timer, 50);
       }
-    },
-    async fetchReadingData() {
-      // 获取阅读列表
-      const resp = await this.$http.get(`/channel/reading/more/${this.lastReadingId}?${this.basicQueryString}`);
-      const result = resp.data;
-      if (result.res === 0 && result.data && result.data.length > 0) {
-        // 更新阅读列表数据
-        this.pushReadingList({ readingList: resp.data.data });
-        const listLen = this.readingList.length;
-        // 记录最后一条阅读数据的ID
-        this.updateLastReadingId({ lastReadingId: this.readingList[listLen - 1].id });
-      }
-    },
-    async fetchMusicData() {
-      // 获取音乐列表
-      const resp = await this.$http.get(`/channel/music/more/${this.lastMusicId}?${this.basicQueryString}`);
-      const result = resp.data;
-      if (result.res === 0 && result.data && result.data.length > 0) {
-        // 更新音乐列表数据
-        this.pushMusicList({ musicList: result.data });
-        const listLen = this.musicList.length;
-        // 记录最后一条音乐数据的ID
-        this.updateLastMusicId({ lastMusicId: this.musicList[listLen - 1].id });
-      }
-    },
-    async fetchMovieData() {
-      // 获取影视列表
-      const resp = await this.$http.get(`/channel/movie/more/${this.lastMovieId}?${this.basicQueryString}`);
-      const result = resp.data;
-      if (result.res === 0 && result.data && result.data.length > 0) {
-        // 更新影视列表数据
-        this.pushMovieList({ movieList: result.data });
-        const listLen = this.movieList.length;
-        // 记录最后一条影视数据的ID
-        this.updateLastMovieId({ lastMovieId: this.movieList[listLen - 1].id });
-      }
-    },
-    updateWrapperHeight() {
-      const wrapperHeight = document.documentElement.clientHeight - this.$refs.wrapper.getBoundingClientRect().top;
-      this.$refs.wrapper.style.height = `${wrapperHeight}px`;
-    },
+    }
+    timer();
   },
   mounted() {
-    this.updateWrapperHeight();
-    window.addEventListener('resize', this.updateWrapperHeight);
-  },
-  destroyed() {
-    window.removeEventListener('resize', this.updateWrapperHeight);
-  },
-};
-</script>
-
-<style lang="scss">
-@import '../styles/rem.scss';
-html, body {
-  height: 100%;
-}
-#home-container {
-  height: 100%;
-  overflow: hidden;
-  background: #fbfbfb;
-  .header {
-   img {
-    height: 46px;
-    width: 46px;
-   }
-   .search-btn {
-    height: 46px;
-    width: 27px;
-    background-image: url('../assets/search.png');
-    background-position: center center;
-    background-size: 27px 27px;
-    background-repeat: no-repeat;
-   }
+    const headerHeight = this.$refs.header.getBoundingClientRect().height;
+    this.$refs.main.style.paddingTop = `${headerHeight + 15}px`;
+    this.$wechat.ready(() => {
+      // 注册微信分享按钮
+      this.$wechat.onMenuShareAppMessage({
+        title: '狼人组局工具',
+        desc: '来自于饥饿狼人',
+        link: 'http://www.supersheep.cn/',
+        imgUrl: 'http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg',
+      });
+      this.$wechat.onMenuShareTimeline({
+        title: '狼人组局工具',
+        link: 'http://www.supersheep.cn/',
+        imgUrl: 'http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg',
+      });
+    });
   }
-  main {
-    height: 100%;
-    .loadmore-wrapper {
-      height: 100%;
-      padding-top: 46px;
-      padding-bottom: 50px;
-      overflow: scroll;
-      -webkit-overflow-scrolling: auto;
-    }
-    .loadmore {
-      ul {
-        list-style: none;
+}
+</script>
+<style lang="scss" scoped>
+@import '../style/color.scss';
+#home {
+  width: 100%;
+  height: 100vh;
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9;
+    .tab-box {
+      .tab-item {
+        transition: flex .5s ease-out;
+      }
+      .tab {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 8px 0;
+        color: #464c5b;
+        background-color: white;
+        transition: background-color 1s ease .3s, color 1.3s ease-out, box-shadow 1.3s;
+        &.tab-left {
+          color: white;
+          background-color: $btn-bgcolor;
+        }
+        &.selected {
+          box-shadow: 0px 1px 2px rgba(0, 0, 0, .5);
+        }
       }
     }
   }
+  main {
+    padding-left: 3vw;
+    padding-right: 3vw;
+    height: 100%;
+    overflow: scroll;
+    .activity-list {
+      list-style: none;
+    }
+    .notice {
+      line-height: 85vh;
+      text-align: center;
+      color: $sub-color;
+      font-size: 14px;
+    }
+  }
+  .new-btn {
+      position: fixed;
+      height: 54px;
+      width: 54px;
+      bottom: 40px;
+      right: 20px;
+      background: $btn-bgcolor;
+      border-radius: 50%;
+      border: none;
+      outline: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, .3);
+      &:active {
+        filter: grayscale(20%);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .6);
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        top: 25px;
+        left: 15px;
+        width: 24px;
+        height: 4px;
+        background-color: #fff;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 25px;
+        width: 4px;
+        height: 24px;
+        background-color: #fff;
+      }
+    }
 }
-.weui-tabbar__item.weui-bar__item_on .weui-tabbar__label span {
-  color: hsla(0, 100%, 10%, .7);
-}
-.vux-x-icon {
-  fill: #999999;
-}
-.weui-bar__item_on .vux-x-icon {
-  fill: hsla(0, 100%, 0%, .7);
-}
-// 过渡样式
-.list-enter-active, .list-leave-active {
-  transition: all .5s ease;
-}
-.list-leave-active {
-  opacity: 0;
-  transform: translateY(30px);
-}
-.list-enter {
-  opacity: 0;
-  transform: translateY(-30px);
-}
-// div.weui-tabbar{
-//   position: fixed;
-// }
-// .rotate {
-//   transform: rotate(180deg);
-//   -webkit-transform: rotate(180deg);
-// }
-// .pullup-arrow {
-//   display: block;
-//   transition: all linear 0.2s;
-//   -webkit-transition: all linear 0.2s;
-//   color: #666;
-//   font-size: 25px;
-// }
-// .scroller-container{
-//   height: 100%;
-// }
-// #vux-scroller-2811y {
-//   height: calc(100%-96px);
-// }
 </style>
